@@ -14,12 +14,7 @@ export const demoStory: Story = {
 			id: 'forest',
 			type: 'scene',
 			title: 'The Forest',
-			text: 'You wake up beneath an ancient tree. The forest around you is quiet, but somewhere in the distance you hear a faint whisper.',
-		},
-		{
-			id: 'first-choice',
-			type: 'choice',
-			title: 'What will you do?',
+			text: 'You wake up beneath an ancient tree. The forest around you is quiet, but somewhere in the distance you hear a faint whisper. What will you do?',
 			choices: [
 				{
 					id: 'follow-whisper',
@@ -36,12 +31,14 @@ export const demoStory: Story = {
 			type: 'scene',
 			title: 'The Whisper',
 			text: 'You follow the sound deeper into the forest and discover a small stone shrine covered in glowing symbols.',
+			choices: [],
 		},
 		{
 			id: 'shelter',
 			type: 'scene',
 			title: 'The Shelter',
 			text: 'You find an abandoned cabin hidden between the trees. Its door is slightly open.',
+			choices: [],
 		},
 		{
 			id: 'mysterious-shrine',
@@ -59,33 +56,33 @@ export const demoStory: Story = {
 	edges: [
 		{
 			id: 'start-to-forest',
+			type: 'continue',
 			source: 'start',
 			target: 'forest',
 		},
 		{
-			id: 'forest-to-choice',
+			id: 'forest-to-whisper',
+			type: 'choice',
 			source: 'forest',
-			target: 'first-choice',
-		},
-		{
-			id: 'choice-to-whisper',
-			source: 'first-choice',
 			target: 'whisper',
 			choiceId: 'follow-whisper',
 		},
 		{
-			id: 'choice-to-shelter',
-			source: 'first-choice',
+			id: 'forest-to-shelter',
+			type: 'choice',
+			source: 'forest',
 			target: 'shelter',
 			choiceId: 'find-shelter',
 		},
 		{
 			id: 'whisper-to-ending',
+			type: 'continue',
 			source: 'whisper',
 			target: 'mysterious-shrine',
 		},
 		{
 			id: 'shelter-to-ending',
+			type: 'continue',
 			source: 'shelter',
 			target: 'old-cabin',
 		},

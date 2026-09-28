@@ -9,7 +9,7 @@ export function getStartNode(story: Story): StoryNode | undefined {
 }
 
 export function getNextNode(story: Story, nodeId: string): StoryNode | undefined {
-	const edge = story.edges.find((edge) => edge.source === nodeId);
+	const edge = story.edges.find((edge) => edge.type === 'continue' && edge.source === nodeId);
 
 	if (!edge) {
 		return undefined;
@@ -19,7 +19,9 @@ export function getNextNode(story: Story, nodeId: string): StoryNode | undefined
 }
 
 export function getNextNodeByChoice(story: Story, nodeId: string, choiceId: string): StoryNode | undefined {
-	const edge = story.edges.find((edge) => edge.source === nodeId && edge.choiceId === choiceId);
+	const edge = story.edges.find(
+		(edge) => edge.type === 'choice' && edge.source === nodeId && edge.choiceId === choiceId,
+	);
 
 	if (!edge) {
 		return undefined;

@@ -23,13 +23,19 @@ describe('Story Engine', () => {
 	});
 
 	test('returns the node selected by choice', () => {
-		const node = getNextNodeByChoice(demoStory, 'first-choice', 'follow-whisper');
+		const node = getNextNodeByChoice(demoStory, 'forest', 'follow-whisper');
 
 		expect(node?.id).toBe('whisper');
 	});
 
 	test('returns undefined for an unknown choice', () => {
-		const node = getNextNodeByChoice(demoStory, 'first-choice', 'unknown-choice');
+		const node = getNextNodeByChoice(demoStory, 'forest', 'unknown-choice');
+
+		expect(node).toBeUndefined();
+	});
+
+	test('does not follow choice edges when continuing', () => {
+		const node = getNextNode(demoStory, 'forest');
 
 		expect(node).toBeUndefined();
 	});
