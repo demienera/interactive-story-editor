@@ -1,16 +1,7 @@
-export type StoryNodeType = 'start' | 'scene' | 'choice' | 'ending';
-
 export type StartNode = {
 	id: string;
 	type: 'start';
 	title: string;
-};
-
-export type SceneNode = {
-	id: string;
-	type: 'scene';
-	title: string;
-	text: string;
 };
 
 export type Choice = {
@@ -18,10 +9,11 @@ export type Choice = {
 	label: string;
 };
 
-export type ChoiceNode = {
+export type SceneNode = {
 	id: string;
-	type: 'choice';
+	type: 'scene';
 	title: string;
+	text: string;
 	choices: Choice[];
 };
 
@@ -32,14 +24,26 @@ export type EndingNode = {
 	text: string;
 };
 
-export type StoryNode = StartNode | SceneNode | ChoiceNode | EndingNode;
+export type StoryNode = StartNode | SceneNode | EndingNode;
 
-export type StoryEdge = {
+export type StoryNodeType = StoryNode['type'];
+
+export type ContinueEdge = {
 	id: string;
+	type: 'continue';
 	source: string;
 	target: string;
-	choiceId?: string;
 };
+
+export type ChoiceEdge = {
+	id: string;
+	type: 'choice';
+	source: string;
+	target: string;
+	choiceId: string;
+};
+
+export type StoryEdge = ContinueEdge | ChoiceEdge;
 
 export type Story = {
 	id: string;
