@@ -43,7 +43,7 @@ export function StoryPlayer() {
 					</button>
 				)}
 
-				{currentNode.type === 'scene' && (
+				{currentNode.type === 'scene' && currentNode.choices.length === 0 && (
 					<button
 						type='button'
 						onClick={handleContinue}
@@ -52,7 +52,7 @@ export function StoryPlayer() {
 					</button>
 				)}
 
-				{currentNode.type === 'choice' && (
+				{currentNode.type === 'scene' && currentNode.choices.length > 0 && (
 					<div className={styles.choices}>
 						{currentNode.choices.map((choice) => (
 							<button
