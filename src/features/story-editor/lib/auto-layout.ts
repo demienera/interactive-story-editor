@@ -1,0 +1,50 @@
+import type { XYPosition } from '@xyflow/react';
+import { getStartNode } from '@/entities/story/model/story-engine';
+import type { Story, StoryNode } from '@/entities/story/model/types';
+
+export type EditorLayout = Record<StoryNode['id'], XYPosition>;
+
+const LEVEL_HEIGHT = 140;
+const SIBLING_WIDTH = 240;
+
+/**
+ * Temporary top-down layout: level (y) = distance from the start node (BFS depth),
+ * position within the level (x) = order of nodes in `story.nodes`.
+ * Nodes unreachable from start go to an extra last level.
+ * Top-down matches default React Flow handles (target on top, source at the bottom).
+ * Will be replaced by a saved layout once users can move nodes.
+ */
+export function layoutByDepth(story: Story): EditorLayout {
+	const depths = new Map<string, number>();
+	const startNode = getStartNode(story);
+
+	if (startNode) {
+		depths.set(startNode.id, 0);
+		const queue = [startNode.id];
+
+		for (const nodeId of queue) {
+			const depth = depths.get(nodeId) ?? 0;
+
+			for (const edge of story.edges) {
+				if (edge.source === nodeId && !depths.has(edge.target)) {
+					depths.set(edge.target, depth + 1);
+					queue.push(edge.target);
+				}
+			}
+		}
+	}
+
+	const unreachableLevel = Math.max(-1, ...depths.values()) + 1;
+	const nodesInLevel = new Map<number, number>();
+	const layout: EditorLayout = {};
+
+	for (const node of story.nodes) {
+		const level = depths.get(node.id) ?? unreachableLevel;
+		const indexInLevel = nodesInLevel.get(level) ?? 0;
+
+		nodesInLevel.set(level, indexInLevel + 1);
+		layout[node.id] = { x: indexInLevel * SIBLING_WIDTH, y: level * LEVEL_HEIGHT };
+	}
+
+	return layout;
+}
