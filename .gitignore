@@ -36,6 +36,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# claude code (personal instructions)
+CLAUDE.local.md
+
+# documentation
+ROADMAP.md
+ARCHITECTURE.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
