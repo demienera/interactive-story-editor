@@ -1,0 +1,63 @@
+$padding: 12px;
+
+.node {
+	width: 220px;
+	padding: $padding;
+	border: 1px solid #1a1a1a;
+	border-radius: 8px;
+	background: #fff;
+	color: #1a1a1a;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.start,
+.ending {
+	border-width: 2px;
+}
+
+.ending {
+	border-style: double;
+	border-width: 4px;
+}
+
+.type {
+	margin: 0 0 4px;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #555;
+}
+
+.title {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.text {
+	display: -webkit-box;
+	margin: 6px 0 0;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+	line-clamp: 3;
+	color: #333;
+}
+
+.choices {
+	margin: 10px (-$padding) 0;
+	padding: 0;
+	list-style: none;
+	border-top: 1px solid #ddd;
+}
+
+.choice {
+	position: relative;
+	padding: 6px $padding;
+
+	& + & {
+		border-top: 1px solid #eee;
+	}
+}
