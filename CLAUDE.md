@@ -11,6 +11,7 @@ Product overview is in `README.md`, versions and task order are in `ROADMAP.md`.
 - Next.js 16 (App Router), React 19
 - `@xyflow/react` 12 (React Flow)
 - SCSS Modules
+- `clsx` for combining class names
 - Vitest
 
 Planned, not installed yet: React Testing Library, React Hook Form + Zod, Redux Toolkit (see `ROADMAP.md`).
@@ -96,6 +97,7 @@ Planned, not installed yet: React Testing Library, React Hook Form + Zod, Redux 
 ## Styling
 
 - Use SCSS Modules for component-specific styles.
+- Combine or conditionally apply class names with `clsx`, not template strings or string concatenation.
 - Keep global styles limited to genuinely global rules.
 - Avoid inline styles unless there is a clear reason.
 - Do not rely on color alone to communicate state.
