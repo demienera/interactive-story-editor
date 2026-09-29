@@ -3,9 +3,9 @@ import clsx from 'clsx';
 import type { EndingFlowNode } from '../../lib/story-to-flow';
 import styles from './StoryNode.module.scss';
 
-export function EndingNode({ data }: NodeProps<EndingFlowNode>) {
+export function EndingNode({ data, selected }: NodeProps<EndingFlowNode>) {
 	return (
-		<div className={clsx(styles.node, styles.ending)}>
+		<div className={clsx(styles.node, styles.ending, { [styles.selected]: selected })}>
 			<Handle
 				type='target'
 				position={Position.Top}

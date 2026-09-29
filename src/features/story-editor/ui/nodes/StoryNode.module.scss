@@ -3,37 +3,45 @@ $padding: 12px;
 .node {
 	width: 220px;
 	padding: $padding;
-	border: 1px solid #1a1a1a;
-	border-radius: 8px;
-	background: #fff;
-	color: #1a1a1a;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	background: var(--color-surface);
+	box-shadow: var(--shadow-node);
+	color: var(--color-text);
 	font-size: 12px;
-	line-height: 1.4;
+	line-height: 1.45;
 }
 
-.start,
-.ending {
-	border-width: 2px;
+.start {
+	border-radius: var(--radius-pill);
+	padding-inline: 20px;
 }
 
 .ending {
-	border-style: double;
-	border-width: 4px;
+	border-style: dashed;
+	border-width: 1.5px;
+}
+
+.selected {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 3px;
 }
 
 .type {
 	margin: 0 0 4px;
 	font-size: 10px;
 	font-weight: 600;
-	letter-spacing: 0.08em;
+	letter-spacing: 0.1em;
 	text-transform: uppercase;
-	color: #555;
+	color: var(--color-text-muted);
 }
 
 .title {
 	margin: 0;
-	font-size: 14px;
+	font-family: var(--font-story);
+	font-size: 16px;
 	font-weight: 600;
+	line-height: 1.25;
 }
 
 .text {
@@ -43,21 +51,21 @@ $padding: 12px;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 3;
 	line-clamp: 3;
-	color: #333;
+	color: var(--color-text-muted);
 }
 
 .choices {
-	margin: 10px (-$padding) 0;
+	margin: 10px (-$padding) (-$padding);
 	padding: 0;
 	list-style: none;
-	border-top: 1px solid #ddd;
+	border-top: 1px solid var(--color-divider);
 }
 
 .choice {
 	position: relative;
-	padding: 6px $padding;
+	padding: 7px $padding;
 
 	& + & {
-		border-top: 1px solid #eee;
+		border-top: 1px solid var(--color-divider);
 	}
 }

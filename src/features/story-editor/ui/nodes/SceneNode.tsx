@@ -1,13 +1,14 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react';
+import clsx from 'clsx';
 import type { SceneFlowNode } from '../../lib/story-to-flow';
 import styles from './StoryNode.module.scss';
 
-export function SceneNode({ data }: NodeProps<SceneFlowNode>) {
+export function SceneNode({ data, selected }: NodeProps<SceneFlowNode>) {
 	const { title, text, choices } = data.node;
 	const hasChoices = choices.length > 0;
 
 	return (
-		<div className={styles.node}>
+		<div className={clsx(styles.node, { [styles.selected]: selected })}>
 			<Handle
 				type='target'
 				position={Position.Top}
