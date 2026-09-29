@@ -4,8 +4,8 @@ import type { Story, StoryNode } from '@/entities/story/model/types';
 
 export type EditorLayout = Record<StoryNode['id'], XYPosition>;
 
-const LEVEL_HEIGHT = 140;
-const SIBLING_WIDTH = 240;
+const LEVEL_HEIGHT = 260;
+const SIBLING_WIDTH = 300;
 
 /**
  * Temporary top-down layout: level (y) = distance from the start node (BFS depth),
