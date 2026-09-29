@@ -1,3 +1,5 @@
+@use './styles/tokens';
+
 * {
 	box-sizing: border-box;
 }
@@ -6,4 +8,20 @@ html,
 body {
 	margin: 0;
 	padding: 0;
+}
+
+body {
+	background: var(--color-canvas);
+	color: var(--color-text);
+	font-family: var(--font-ui);
+	line-height: 1.5;
+}
+
+:focus-visible {
+	outline: var(--focus-ring);
+	outline-offset: 2px;
+}
+
+a {
+	color: var(--color-accent);
 }
