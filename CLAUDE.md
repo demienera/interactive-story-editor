@@ -32,6 +32,7 @@ Planned, not installed yet: React Testing Library, React Hook Form + Zod, Redux 
 - `src/features/story-editor/ui`: `StoryEditor` component
 - `src/features/story-player/ui`: `StoryPlayer` component
 - `src/app/editor`, `src/app/play`: route pages
+- `src/app/styles/_tokens.scss`: design tokens (CSS custom properties), the only place with literal colors
 
 ## Conventions
 
