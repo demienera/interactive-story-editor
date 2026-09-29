@@ -1,30 +1,56 @@
 import type { Edge, Node } from '@xyflow/react';
-import type { Story, StoryEdge, StoryNode } from '@/entities/story/model/types';
+import type {
+	ChoiceEdge,
+	EndingNode,
+	SceneNode,
+	StartNode,
+	Story,
+	StoryEdge,
+	StoryNode,
+} from '@/entities/story/model/types';
 import type { EditorLayout } from './auto-layout';
 
-export type StoryFlowNodeData = {
-	label: string;
-	nodeType: StoryNode['type'];
-};
+// React Flow node `type` matches the domain `node.type`, so React Flow picks the component from `nodeTypes`.
+// Custom nodes only read `data.node`; changes to the story go through domain operations.
+export type StartFlowNode = Node<{ node: StartNode }, 'start'>;
+export type SceneFlowNode = Node<{ node: SceneNode }, 'scene'>;
+export type EndingFlowNode = Node<{ node: EndingNode }, 'ending'>;
 
-export type StoryFlowNode = Node<StoryFlowNodeData>;
+export type StoryFlowNode = StartFlowNode | SceneFlowNode | EndingFlowNode;
 
-function createFlowNode(node: StoryNode, layout: EditorLayout): StoryFlowNode {
-	return {
-		id: node.id,
-		position: layout[node.id] ?? { x: 0, y: 0 },
-		data: {
-			label: node.title,
-			nodeType: node.type,
-		},
-	};
+function getNodeAriaLabel(node: StoryNode): string {
+	switch (node.type) {
+		case 'start':
+			return `Start: ${node.title}`;
+		case 'scene':
+			return node.choices.length > 0 ? `Scene: ${node.title}, ${node.choices.length} choices` : `Scene: ${node.title}`;
+		case 'ending':
+			return `Ending: ${node.title}`;
+	}
 }
 
-function getChoiceLabel(story: Story, edge: StoryEdge): string | undefined {
-	if (edge.type !== 'choice') {
-		return undefined;
-	}
+function createFlowNode(node: StoryNode, layout: EditorLayout): StoryFlowNode {
+	const base = {
+		id: node.id,
+		position: layout[node.id] ?? { x: 0, y: 0 },
+		ariaLabel: getNodeAriaLabel(node),
+	};
 
+	switch (node.type) {
+		case 'start':
+			return { ...base, type: 'start', data: { node } };
+		case 'scene':
+			return { ...base, type: 'scene', data: { node } };
+		case 'ending':
+			return { ...base, type: 'ending', data: { node } };
+	}
+}
+
+function getNodeTitle(story: Story, nodeId: string): string {
+	return story.nodes.find((node) => node.id === nodeId)?.title ?? nodeId;
+}
+
+function getChoiceLabel(story: Story, edge: ChoiceEdge): string {
 	const sourceNode = story.nodes.find((node) => node.id === edge.source);
 	const choice =
 		sourceNode?.type === 'scene' ? sourceNode.choices.find((item) => item.id === edge.choiceId) : undefined;
@@ -33,13 +59,24 @@ function getChoiceLabel(story: Story, edge: StoryEdge): string | undefined {
 }
 
 function createFlowEdge(story: Story, edge: StoryEdge): Edge {
-	const label = getChoiceLabel(story, edge);
-
-	return {
+	const flowEdge: Edge = {
 		id: edge.id,
 		source: edge.source,
 		target: edge.target,
-		...(label && { label }),
+	};
+
+	if (edge.type === 'continue') {
+		return {
+			...flowEdge,
+			ariaLabel: `Continue from ${getNodeTitle(story, edge.source)} to ${getNodeTitle(story, edge.target)}`,
+		};
+	}
+
+	return {
+		...flowEdge,
+		type: 'smoothstep',
+		sourceHandle: edge.choiceId,
+		ariaLabel: `Choice "${getChoiceLabel(story, edge)}" from ${getNodeTitle(story, edge.source)} to ${getNodeTitle(story, edge.target)}`,
 	};
 }
 
