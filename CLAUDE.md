@@ -1,3 +1,42 @@
+@AGENTS.md
+@docs/ARCHITECTURE.md
+
+# Project
+
+Interactive Story Editor: a visual editor and player for branching stories.
+Product overview is in `README.md`, versions and task order are in `ROADMAP.md`.
+
+## Stack
+
+- Next.js 16 (App Router), React 19
+- `@xyflow/react` 12 (React Flow)
+- SCSS Modules
+- Vitest
+
+Planned, not installed yet: React Testing Library, React Hook Form + Zod, Redux Toolkit (see `ROADMAP.md`).
+
+## Commands
+
+- `npm run dev`: start the dev server
+- `npm run lint`: run ESLint
+- `npm run build`: production build
+- `npm run test`: run all tests
+- `npx vitest run <path>`: run a single test file
+
+## Layout
+
+- `src/entities/story/model`: story types and `story-engine` (domain logic)
+- `src/entities/story/data`: demo story data
+- `src/features/story-editor/lib`: story-to-flow conversion, auto layout
+- `src/features/story-editor/ui`: `StoryEditor` component
+- `src/features/story-player/ui`: `StoryPlayer` component
+- `src/app/editor`, `src/app/play`: route pages
+
+## Conventions
+
+- Tests live next to the code as `*.test.ts`.
+- Non-component files use kebab-case; components use PascalCase.
+
 # Development Guidelines
 
 ## Architecture
@@ -50,7 +89,7 @@
 
 - Test behavior and contracts rather than implementation details.
 - Keep domain logic tests independent from React.
-- Use React Testing Library for important UI behavior.
+- Use React Testing Library for important UI behavior (once it is installed).
 - Prefer meaningful tests over tests written only for coverage.
 - Run lint, build, and tests after significant changes.
 
@@ -68,7 +107,7 @@
 - Do not add dependencies without a concrete need.
 - Do not create abstractions before a real repetition or complexity appears.
 - Preserve the existing architecture unless there is a clear reason to change it.
-- After significant changes, run:
-  - `npm run lint`
-  - `npm run build`
-  - `npm run test`
+- Do not mix domain logic with UI just for brevity.
+- Do not add Tailwind or a custom UI library.
+- WebSocket is only for Party Mode (v2); backend, database, and authentication not before v3.
+- Avoid complex state machines and generic "for the future" components.

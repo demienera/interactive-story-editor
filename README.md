@@ -13,6 +13,13 @@ The application is built around two main modes:
 
 The long-term goal is to allow users to create branching stories without writing code and publish them for others to play.
 
+### What makes it different
+
+There are already many visual editors for branching stories (Twine, Ink, Arcweave). This project focuses on two things:
+
+- **Party Mode (v2)** — play a story together in real time. A host starts the story, participants join via a link or QR code and vote on choices; the majority wins.
+- **Multiple renderers for one story** — the same `Story` is played by the HTML Player and later (v3) by a Phaser visual-novel player. This is practical proof that the domain does not depend on the UI.
+
 ### Story flow
 
 ```text
