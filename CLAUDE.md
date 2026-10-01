@@ -13,8 +13,9 @@ Product overview is in `README.md`, versions and task order are in `ROADMAP.md`.
 - SCSS Modules
 - `clsx` for combining class names
 - Vitest
+- React Hook Form + Zod
 
-Planned, not installed yet: React Testing Library, React Hook Form + Zod, Redux Toolkit (see `ROADMAP.md`).
+Planned, not installed yet: React Testing Library, Redux Toolkit (see `ROADMAP.md`).
 
 ## Commands
 
@@ -28,8 +29,8 @@ Planned, not installed yet: React Testing Library, React Hook Form + Zod, Redux 
 
 - `src/entities/story/model`: story types and `story-engine` (domain logic)
 - `src/entities/story/data`: demo story data
-- `src/features/story-editor/lib`: story-to-flow conversion, auto layout
-- `src/features/story-editor/ui`: `StoryEditor` component
+- `src/features/story-editor/lib`: story-to-flow conversion, auto layout, node form schemas
+- `src/features/story-editor/ui`: `StoryEditor` component, custom nodes (`nodes/`), node editing panel (`node-panel/`)
 - `src/features/story-player/ui`: `StoryPlayer` component
 - `src/app/editor`, `src/app/play`: route pages
 - `src/app/styles/_tokens.scss`: design tokens (CSS custom properties), the only place with literal colors
