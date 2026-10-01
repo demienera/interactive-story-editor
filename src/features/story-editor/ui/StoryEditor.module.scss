@@ -43,7 +43,21 @@
 	}
 }
 
-.editor {
+.workspace {
+	min-height: 0;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 360px;
+
+	@media (max-width: 899px) {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: 60dvh auto;
+		overflow-y: auto;
+	}
+}
+
+.canvas {
+	min-width: 0;
+	min-height: 0;
 	width: 100%;
 	height: 100%;
 
