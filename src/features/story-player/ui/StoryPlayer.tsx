@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { demoStory } from '@/entities/story/data/demo-story';
 import { getNextNode, getNextNodeByChoice, getStartNode } from '@/entities/story/model/story-engine';
 import type { StoryNode } from '@/entities/story/model/types';
@@ -11,25 +11,37 @@ import styles from './StoryPlayer.module.scss';
 
 export function StoryPlayer() {
 	const [currentNode, setCurrentNode] = useState<StoryNode | undefined>(getStartNode(demoStory));
+	const titleRef = useRef<HTMLHeadingElement>(null);
+	const shouldFocusTitle = useRef(false);
+
+	useEffect(() => {
+		if (!shouldFocusTitle.current) {
+			return;
+		}
+
+		shouldFocusTitle.current = false;
+		titleRef.current?.focus();
+	}, [currentNode]);
 
 	if (!currentNode) {
 		return <p>Story has no start node.</p>;
 	}
 
-	const handleContinue = () => {
-		const nextNode = getNextNode(demoStory, currentNode.id);
+	const goTo = (node: StoryNode | undefined) => {
+		shouldFocusTitle.current = true;
+		setCurrentNode(node);
+	};
 
-		setCurrentNode(nextNode);
+	const handleContinue = () => {
+		goTo(getNextNode(demoStory, currentNode.id));
 	};
 
 	const handleChoice = (choiceId: string) => {
-		const nextNode = getNextNodeByChoice(demoStory, currentNode.id, choiceId);
-
-		setCurrentNode(nextNode);
+		goTo(getNextNodeByChoice(demoStory, currentNode.id, choiceId));
 	};
 
 	const handleRestart = () => {
-		setCurrentNode(getStartNode(demoStory));
+		goTo(getStartNode(demoStory));
 	};
 
 	return (
@@ -67,7 +79,13 @@ export function StoryPlayer() {
 				<div className={styles.card}>
 					<p className={styles.storyTitle}>{demoStory.title}</p>
 
-					<h1 className={styles.title}>{currentNode.title}</h1>
+					<h1
+						ref={titleRef}
+						tabIndex={-1}
+						className={styles.title}
+					>
+						{currentNode.title}
+					</h1>
 
 					{currentNode.type === 'scene' && <p className={styles.text}>{currentNode.text}</p>}
 					{currentNode.type === 'ending' && <p className={styles.text}>{currentNode.text}</p>}
