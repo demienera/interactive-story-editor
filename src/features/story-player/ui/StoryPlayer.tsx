@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { demoStory } from '@/entities/story/data/demo-story';
 import { getNextNode, getNextNodeByChoice, getStartNode } from '@/entities/story/model/story-engine';
 import type { StoryNode } from '@/entities/story/model/types';
-import playerBackground from '../../../../public/main-bg.png';
+import playerBackground from '../../../../public/bg.jpg';
 import styles from './StoryPlayer.module.scss';
 
 export function StoryPlayer() {
