@@ -31,7 +31,7 @@ export const endingFormSchema = z.object({ title: titleSchema, text: textSchema 
 export const sceneFormSchema = z.object({
 	title: titleSchema,
 	text: textSchema,
-	choices: z.array(z.object({ label: choiceLabelSchema })),
+	choices: z.array(z.object({ choiceId: z.string(), label: choiceLabelSchema })),
 });
 
 export type StartFormValues = z.infer<typeof startFormSchema>;
@@ -58,15 +58,15 @@ export function toSceneFormValues(node: SceneNode): SceneFormValues {
 	return {
 		title: node.title,
 		text: node.text,
-		choices: node.choices.map((choice) => ({ label: choice.label })),
+		choices: node.choices.map((choice) => ({ choiceId: choice.id, label: choice.label })),
 	};
 }
 
-export function toScenePatch(node: SceneNode, values: SceneFormValues): StoryNodePatch {
+export function toScenePatch(values: SceneFormValues): StoryNodePatch {
 	return {
 		type: 'scene',
 		title: values.title,
 		text: values.text,
-		choices: node.choices.map((choice, index) => ({ ...choice, label: values.choices[index]?.label ?? choice.label })),
+		choices: values.choices.map((choice) => ({ id: choice.choiceId, label: choice.label })),
 	};
 }

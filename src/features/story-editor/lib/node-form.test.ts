@@ -44,7 +44,14 @@ describe('node form schemas', () => {
 	});
 
 	test('reject an empty choice label with a path to the field', () => {
-		const result = sceneFormSchema.safeParse({ title: 'Gate', text: 'Text', choices: [{ label: 'Left' }, { label: '' }] });
+		const result = sceneFormSchema.safeParse({
+			title: 'Gate',
+			text: 'Text',
+			choices: [
+				{ choiceId: 'left', label: 'Left' },
+				{ choiceId: 'right', label: '' },
+			],
+		});
 
 		expect(result.error?.issues[0]?.path).toEqual(['choices', 1, 'label']);
 	});
@@ -55,15 +62,21 @@ describe('scene form mapping', () => {
 		expect(toSceneFormValues(scene)).toEqual({
 			title: 'The Gate',
 			text: 'Two paths lead away from the gate.',
-			choices: [{ label: 'Go left' }, { label: 'Go right' }],
+			choices: [
+				{ choiceId: 'go-left', label: 'Go left' },
+				{ choiceId: 'go-right', label: 'Go right' },
+			],
 		});
 	});
 
 	test('keeps choice ids and order when building a patch', () => {
-		const patch = toScenePatch(scene, {
+		const patch = toScenePatch({
 			title: 'The Old Gate',
 			text: 'Moss covers the stones.',
-			choices: [{ label: 'Take the left path' }, { label: 'Go right' }],
+			choices: [
+				{ choiceId: 'go-left', label: 'Take the left path' },
+				{ choiceId: 'go-right', label: 'Go right' },
+			],
 		});
 
 		expect(patch).toEqual({
@@ -77,6 +90,27 @@ describe('scene form mapping', () => {
 		});
 	});
 
+	test('a removed choice is left out and a new choice keeps its id', () => {
+		const patch = toScenePatch({
+			title: 'The Gate',
+			text: 'Two paths lead away from the gate.',
+			choices: [
+				{ choiceId: 'go-right', label: 'Go right' },
+				{ choiceId: 'new-choice', label: 'Climb the wall' },
+			],
+		});
+
+		expect(patch).toEqual({
+			type: 'scene',
+			title: 'The Gate',
+			text: 'Two paths lead away from the gate.',
+			choices: [
+				{ id: 'go-right', label: 'Go right' },
+				{ id: 'new-choice', label: 'Climb the wall' },
+			],
+		});
+	});
+
 	test('a saved scene keeps its edges and the story stays valid', () => {
 		const forest = demoStory.nodes.find((node) => node.id === 'forest');
 
@@ -85,7 +119,7 @@ describe('scene form mapping', () => {
 		}
 
 		const values = { ...toSceneFormValues(forest), title: 'The Dark Forest' };
-		const story = updateNode(demoStory, forest.id, toScenePatch(forest, values));
+		const story = updateNode(demoStory, forest.id, toScenePatch(values));
 
 		expect(story.edges).toEqual(demoStory.edges);
 		expect(validateStory(story)).toEqual([]);
