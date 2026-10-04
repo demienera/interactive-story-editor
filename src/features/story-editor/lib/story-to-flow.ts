@@ -8,7 +8,7 @@ import type {
 	StoryEdge,
 	StoryNode,
 } from '@/entities/story/model/types';
-import type { EditorLayout } from './auto-layout';
+import type { EditorLayout } from './editor-layout';
 
 // React Flow node `type` matches the domain `node.type`, so React Flow picks the component from `nodeTypes`.
 // Custom nodes only read `data.node`; changes to the story go through domain operations.

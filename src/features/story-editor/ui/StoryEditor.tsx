@@ -8,13 +8,15 @@ import { getNode } from '@/entities/story/model/story-engine';
 import { updateNode, type StoryNodePatch } from '@/entities/story/model/story-operations';
 import type { Story } from '@/entities/story/model/types';
 import { layoutByDepth } from '../lib/auto-layout';
+import { applyPositionChanges, applySizeChanges, type EditorLayout, type NodeSizes } from '../lib/editor-layout';
 import { storyToFlow, type StoryFlowNode } from '../lib/story-to-flow';
 import { NodePanel } from './node-panel/NodePanel';
 import { nodeTypes } from './nodes/node-types';
 import '@xyflow/react/dist/style.css';
 import styles from './StoryEditor.module.scss';
 
-const NODE_DESCRIPTION = 'Press Enter or Space to edit the node in the panel. Press Escape to clear the selection.';
+const NODE_DESCRIPTION =
+	'Press Enter or Space to select the node and edit it in the panel. Use the arrow keys to move a selected node. Press Escape to clear the selection.';
 
 const ariaLabelConfig: Partial<AriaLabelConfig> = {
 	'node.a11yDescription.default': NODE_DESCRIPTION,
@@ -24,15 +26,25 @@ const ariaLabelConfig: Partial<AriaLabelConfig> = {
 
 export function StoryEditor() {
 	const [story, setStory] = useState<Story>(demoStory);
+	const [layout, setLayout] = useState<EditorLayout>(() => layoutByDepth(demoStory));
+	const [nodeSizes, setNodeSizes] = useState<NodeSizes>({});
 	const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-	const flow = useMemo(() => storyToFlow(story, layoutByDepth(story)), [story]);
+	const flow = useMemo(() => storyToFlow(story, layout), [story, layout]);
 	const nodes = useMemo(
-		() => flow.nodes.map((node) => (node.id === selectedNodeId ? { ...node, selected: true } : node)),
-		[flow.nodes, selectedNodeId],
+		() =>
+			flow.nodes.map((node) => ({
+				...node,
+				measured: nodeSizes[node.id],
+				selected: node.id === selectedNodeId,
+			})),
+		[flow.nodes, nodeSizes, selectedNodeId],
 	);
 	const selectedNode = selectedNodeId ? getNode(story, selectedNodeId) : undefined;
 
 	const handleNodesChange = (changes: NodeChange<StoryFlowNode>[]) => {
+		setLayout((current) => applyPositionChanges(current, changes));
+		setNodeSizes((current) => applySizeChanges(current, changes));
+
 		for (const change of changes) {
 			if (change.type !== 'select') {
 				continue;
@@ -77,7 +89,6 @@ export function StoryEditor() {
 						edges={flow.edges}
 						nodeTypes={nodeTypes}
 						onNodesChange={handleNodesChange}
-						nodesDraggable={false}
 						nodesConnectable={false}
 						deleteKeyCode={null}
 						ariaLabelConfig={ariaLabelConfig}
