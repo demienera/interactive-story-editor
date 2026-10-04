@@ -1,4 +1,4 @@
-import type { Edge, Node } from '@xyflow/react';
+import { MarkerType, type Edge, type Node } from '@xyflow/react';
 import type {
 	ChoiceEdge,
 	EndingNode,
@@ -23,7 +23,11 @@ function getNodeAriaLabel(node: StoryNode): string {
 		case 'start':
 			return `Start: ${node.title}`;
 		case 'scene':
-			return node.choices.length > 0 ? `Scene: ${node.title}, ${node.choices.length} choices` : `Scene: ${node.title}`;
+			if (node.choices.length === 0) {
+				return `Scene: ${node.title}`;
+			}
+
+			return `Scene: ${node.title}, ${node.choices.length} ${node.choices.length === 1 ? 'choice' : 'choices'}`;
 		case 'ending':
 			return `Ending: ${node.title}`;
 	}
@@ -63,6 +67,8 @@ function createFlowEdge(story: Story, edge: StoryEdge): Edge {
 		id: edge.id,
 		source: edge.source,
 		target: edge.target,
+		type: 'story',
+		markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--color-edge)' },
 	};
 
 	if (edge.type === 'continue') {
@@ -74,7 +80,6 @@ function createFlowEdge(story: Story, edge: StoryEdge): Edge {
 
 	return {
 		...flowEdge,
-		type: 'smoothstep',
 		sourceHandle: edge.choiceId,
 		ariaLabel: `Choice "${getChoiceLabel(story, edge)}" from ${getNodeTitle(story, edge.source)} to ${getNodeTitle(story, edge.target)}`,
 	};

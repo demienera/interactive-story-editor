@@ -1,3 +1,4 @@
+import { MarkerType } from '@xyflow/react';
 import { describe, expect, test } from 'vitest';
 import { demoStory } from '@/entities/story/data/demo-story';
 import type { Story } from '@/entities/story/model/types';
@@ -28,6 +29,15 @@ describe('storyToFlow', () => {
 		expect(nodes.find((node) => node.id === 'old-cabin')?.ariaLabel).toBe('Ending: The Old Cabin');
 	});
 
+	test('uses the singular for a scene with one choice', () => {
+		const story: Story = {
+			...demoStory,
+			nodes: [{ id: 'gate', type: 'scene', title: 'The Gate', text: '', choices: [{ id: 'open', label: 'Open' }] }],
+		};
+
+		expect(storyToFlow(story, layout).nodes[0]?.ariaLabel).toBe('Scene: The Gate, 1 choice');
+	});
+
 	test('converts continue edges without a source handle', () => {
 		const { edges } = storyToFlow(demoStory, layout);
 
@@ -36,6 +46,8 @@ describe('storyToFlow', () => {
 			id: 'start-to-forest',
 			source: 'start',
 			target: 'forest',
+			type: 'story',
+			markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--color-edge)' },
 			ariaLabel: 'Continue from Start to The Forest',
 		});
 	});
