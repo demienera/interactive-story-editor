@@ -8,13 +8,15 @@ type FormFieldProps = {
 	registration: UseFormRegisterReturn;
 	error?: string;
 	multiline?: boolean;
+	autoFocus?: boolean;
 };
 
-export function FormField({ label, registration, error, multiline = false }: FormFieldProps) {
+export function FormField({ label, registration, error, multiline = false, autoFocus = false }: FormFieldProps) {
 	const id = useId();
 	const errorId = `${id}-error`;
 	const controlProps = {
 		id,
+		autoFocus,
 		className: clsx(styles.control, { [styles.multiline]: multiline }),
 		'aria-invalid': error ? true : undefined,
 		'aria-describedby': error ? errorId : undefined,

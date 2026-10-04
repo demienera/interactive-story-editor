@@ -10,9 +10,10 @@ import styles from './NodePanel.module.scss';
 type SceneNodeFormProps = {
 	node: SceneNode;
 	onSave: (patch: StoryNodePatch) => void;
+	autoFocusTitle: boolean;
 };
 
-export function SceneNodeForm({ node, onSave }: SceneNodeFormProps) {
+export function SceneNodeForm({ node, onSave, autoFocusTitle }: SceneNodeFormProps) {
 	const {
 		register,
 		handleSubmit,
@@ -38,6 +39,7 @@ export function SceneNodeForm({ node, onSave }: SceneNodeFormProps) {
 				label='Title'
 				registration={register('title')}
 				error={errors.title?.message}
+				autoFocus={autoFocusTitle}
 			/>
 			<FormField
 				label='Text'

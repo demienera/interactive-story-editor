@@ -10,9 +10,10 @@ import styles from './NodePanel.module.scss';
 type EndingNodeFormProps = {
 	node: EndingNode;
 	onSave: (patch: StoryNodePatch) => void;
+	autoFocusTitle: boolean;
 };
 
-export function EndingNodeForm({ node, onSave }: EndingNodeFormProps) {
+export function EndingNodeForm({ node, onSave, autoFocusTitle }: EndingNodeFormProps) {
 	const {
 		register,
 		handleSubmit,
@@ -38,6 +39,7 @@ export function EndingNodeForm({ node, onSave }: EndingNodeFormProps) {
 				label='Title'
 				registration={register('title')}
 				error={errors.title?.message}
+				autoFocus={autoFocusTitle}
 			/>
 			<FormField
 				label='Text'

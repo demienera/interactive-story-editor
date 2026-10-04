@@ -10,9 +10,10 @@ import styles from './NodePanel.module.scss';
 type StartNodeFormProps = {
 	node: StartNode;
 	onSave: (patch: StoryNodePatch) => void;
+	autoFocusTitle: boolean;
 };
 
-export function StartNodeForm({ node, onSave }: StartNodeFormProps) {
+export function StartNodeForm({ node, onSave, autoFocusTitle }: StartNodeFormProps) {
 	const {
 		register,
 		handleSubmit,
@@ -38,6 +39,7 @@ export function StartNodeForm({ node, onSave }: StartNodeFormProps) {
 				label='Title'
 				registration={register('title')}
 				error={errors.title?.message}
+				autoFocus={autoFocusTitle}
 			/>
 			<SaveActions saved={isSubmitSuccessful && !isDirty} />
 		</form>
