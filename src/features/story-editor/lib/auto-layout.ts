@@ -1,18 +1,16 @@
-import type { XYPosition } from '@xyflow/react';
 import { getStartNode } from '@/entities/story/model/story-engine';
-import type { Story, StoryNode } from '@/entities/story/model/types';
-
-export type EditorLayout = Record<StoryNode['id'], XYPosition>;
+import type { Story } from '@/entities/story/model/types';
+import type { EditorLayout } from './editor-layout';
 
 const LEVEL_HEIGHT = 260;
 const SIBLING_WIDTH = 300;
 
 /**
- * Temporary top-down layout: level (y) = distance from the start node (BFS depth),
+ * Initial top-down layout: level (y) = distance from the start node (BFS depth),
  * position within the level (x) = order of nodes in `story.nodes`.
  * Nodes unreachable from start go to an extra last level.
  * Top-down matches default React Flow handles (target on top, source at the bottom).
- * Will be replaced by a saved layout once users can move nodes.
+ * After that the author moves nodes, and the editor keeps the layout as its own state.
  */
 export function layoutByDepth(story: Story): EditorLayout {
 	const depths = new Map<string, number>();
