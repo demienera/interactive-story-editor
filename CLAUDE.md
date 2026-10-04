@@ -29,7 +29,7 @@ Planned, not installed yet: React Testing Library, Redux Toolkit (see `ROADMAP.m
 
 - `src/entities/story/model`: story types and `story-engine` (domain logic)
 - `src/entities/story/data`: demo story data
-- `src/features/story-editor/lib`: story-to-flow conversion, auto layout, node form schemas
+- `src/features/story-editor/lib`: story-to-flow conversion, editor layout state, initial auto layout, node form schemas
 - `src/features/story-editor/ui`: `StoryEditor` component, custom nodes (`nodes/`), node editing panel (`node-panel/`)
 - `src/features/story-player/ui`: `StoryPlayer` component
 - `src/app/editor`, `src/app/play`: route pages
