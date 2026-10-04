@@ -1,16 +1,20 @@
 import { useEffect, useId, useRef } from 'react';
 import type { StoryNodePatch } from '@/entities/story/model/story-operations';
-import type { StoryNode } from '@/entities/story/model/types';
+import type { Story, StoryNode } from '@/entities/story/model/types';
+import type { Exit } from '../../lib/transitions';
 import { EndingNodeForm } from './EndingNodeForm';
+import { NodeConnections } from './NodeConnections';
 import { SceneNodeForm } from './SceneNodeForm';
 import { StartNodeForm } from './StartNodeForm';
 import styles from './NodePanel.module.scss';
 
 type NodePanelProps = {
+	story: Story;
 	node: StoryNode | undefined;
 	autoFocusTitle: boolean;
 	onSave: (nodeId: string, patch: StoryNodePatch) => void;
 	onDelete: (nodeId: string) => void;
+	onExitChange: (exit: Exit, targetId: string | null) => void;
 };
 
 const headings = {
@@ -25,7 +29,7 @@ const deleteLabels = {
 	ending: 'Delete ending',
 } satisfies Record<StoryNode['type'], string>;
 
-export function NodePanel({ node, autoFocusTitle, onSave, onDelete }: NodePanelProps) {
+export function NodePanel({ story, node, autoFocusTitle, onSave, onDelete, onExitChange }: NodePanelProps) {
 	const headingId = useId();
 	const headingRef = useRef<HTMLHeadingElement>(null);
 	const shouldFocusHeading = useRef(false);
@@ -69,6 +73,11 @@ export function NodePanel({ node, autoFocusTitle, onSave, onDelete }: NodePanelP
 						node={node}
 						autoFocusTitle={autoFocusTitle}
 						onSave={(patch) => onSave(node.id, patch)}
+					/>
+					<NodeConnections
+						story={story}
+						node={node}
+						onChange={onExitChange}
 					/>
 					<button
 						type='button'

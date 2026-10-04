@@ -119,3 +119,46 @@
 		background: var(--color-surface-raised);
 	}
 }
+
+.hint {
+	margin: 0;
+	color: var(--color-text-muted);
+	font-size: 14px;
+}
+
+.choiceRow {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: end;
+	gap: 8px;
+}
+
+.secondaryButton {
+	justify-self: start;
+	min-height: 40px;
+	padding: 8px 16px;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-pill);
+	background: transparent;
+	color: var(--color-text);
+	font: 500 14px/1 var(--font-ui);
+	cursor: pointer;
+
+	&:hover {
+		background: var(--color-surface-raised);
+	}
+}
+
+.connections {
+	display: grid;
+	gap: 12px;
+	margin-top: 24px;
+	padding-top: 20px;
+	border-top: 1px solid var(--color-divider);
+}
+
+.subheading {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 600;
+}

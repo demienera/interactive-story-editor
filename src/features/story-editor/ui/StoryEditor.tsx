@@ -8,6 +8,7 @@ import {
 	Panel,
 	ReactFlow,
 	type AriaLabelConfig,
+	type Connection,
 	type Edge,
 	type NodeChange,
 	type ReactFlowInstance,
@@ -15,7 +16,7 @@ import {
 } from '@xyflow/react';
 import { demoStory } from '@/entities/story/data/demo-story';
 import { getNode } from '@/entities/story/model/story-engine';
-import { addNode, removeNode, updateNode, type StoryNodePatch } from '@/entities/story/model/story-operations';
+import { addNode, removeNode, type StoryNodePatch } from '@/entities/story/model/story-operations';
 import type { Story, StoryNodeType } from '@/entities/story/model/types';
 import { layoutByDepth } from '../lib/auto-layout';
 import {
@@ -27,6 +28,14 @@ import {
 } from '../lib/editor-layout';
 import { createNode } from '../lib/node-factory';
 import { storyToFlow, type StoryFlowNode } from '../lib/story-to-flow';
+import {
+	canLeadTo,
+	getExitFromHandle,
+	setExitTarget,
+	updateNodeAndExits,
+	type Exit,
+} from '../lib/transitions';
+import { edgeTypes } from './edges/edge-types';
 import { NodePanel } from './node-panel/NodePanel';
 import { nodeTypes } from './nodes/node-types';
 import '@xyflow/react/dist/style.css';
@@ -39,6 +48,7 @@ const ariaLabelConfig: Partial<AriaLabelConfig> = {
 	'node.a11yDescription.default': NODE_DESCRIPTION,
 	'node.a11yDescription.keyboardDisabled': NODE_DESCRIPTION,
 	'edge.a11yDescription.default': '',
+	'handle.ariaLabel': 'Connection point',
 };
 
 // Matches `.node` width in StoryNode.module.scss.
@@ -120,8 +130,26 @@ export function StoryEditor() {
 	};
 
 	const handleSave = (nodeId: string, patch: StoryNodePatch) => {
-		setStory((current) => updateNode(current, nodeId, patch));
+		setStory((current) => updateNodeAndExits(current, nodeId, patch));
 	};
+
+	const handleExitChange = (exit: Exit, targetId: string | null) => {
+		const target = targetId ? getNode(story, targetId) : undefined;
+
+		setStory((current) => setExitTarget(current, exit, targetId, crypto.randomUUID()));
+		setStatusMessage(target ? `Connected to "${target.title}"` : 'Connection removed');
+	};
+
+	const handleConnect = (connection: Connection) => {
+		const exit = getExitFromHandle(story, connection.source, connection.sourceHandle ?? null);
+
+		if (exit) {
+			handleExitChange(exit, connection.target);
+		}
+	};
+
+	const isValidConnection = (connection: Connection | Edge) =>
+		canLeadTo(story, connection.source, connection.target);
 
 	const handleDeleteNode = (nodeId: string) => {
 		const node = getNode(story, nodeId);
@@ -163,17 +191,19 @@ export function StoryEditor() {
 						nodes={nodes}
 						edges={flow.edges}
 						nodeTypes={nodeTypes}
+						edgeTypes={edgeTypes}
 						onNodesChange={handleNodesChange}
 						onInit={(instance) => {
 							flowInstance.current = instance;
 						}}
-						nodesConnectable={false}
+						onConnect={handleConnect}
+						isValidConnection={isValidConnection}
 						deleteKeyCode={null}
 						ariaLabelConfig={ariaLabelConfig}
 						fitView
 					>
 						<Panel
-							position='top-left'
+							position='top-right'
 							className={styles.addPanel}
 						>
 							<button
@@ -206,10 +236,12 @@ export function StoryEditor() {
 				</div>
 
 				<NodePanel
+					story={story}
 					node={selectedNode}
 					autoFocusTitle={selectedNodeId !== null && selectedNodeId === createdNodeId}
 					onSave={handleSave}
 					onDelete={handleDeleteNode}
+					onExitChange={handleExitChange}
 				/>
 			</main>
 

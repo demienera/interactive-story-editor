@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useRef } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
 import type { StoryNodePatch } from '@/entities/story/model/story-operations';
 import type { SceneNode } from '@/entities/story/model/types';
 import { sceneFormSchema, toSceneFormValues, toScenePatch, type SceneFormValues } from '../../lib/node-form';
@@ -15,6 +16,7 @@ type SceneNodeFormProps = {
 
 export function SceneNodeForm({ node, onSave, autoFocusTitle }: SceneNodeFormProps) {
 	const {
+		control,
 		register,
 		handleSubmit,
 		reset,
@@ -23,10 +25,17 @@ export function SceneNodeForm({ node, onSave, autoFocusTitle }: SceneNodeFormPro
 		resolver: zodResolver(sceneFormSchema),
 		defaultValues: toSceneFormValues(node),
 	});
+	const { fields, append, remove } = useFieldArray({ control, name: 'choices' });
+	const addChoiceRef = useRef<HTMLButtonElement>(null);
 
 	const onSubmit = (values: SceneFormValues) => {
-		onSave(toScenePatch(node, values));
+		onSave(toScenePatch(values));
 		reset(values);
+	};
+
+	const handleRemoveChoice = (index: number) => {
+		remove(index);
+		addChoiceRef.current?.focus();
 	};
 
 	return (
@@ -48,19 +57,38 @@ export function SceneNodeForm({ node, onSave, autoFocusTitle }: SceneNodeFormPro
 				multiline
 			/>
 
-			{node.choices.length > 0 && (
-				<fieldset className={styles.fieldset}>
-					<legend className={styles.legend}>Choices</legend>
-					{node.choices.map((choice, index) => (
+			<fieldset className={styles.fieldset}>
+				<legend className={styles.legend}>Choices</legend>
+				{fields.length === 0 && <p className={styles.hint}>No choices: the scene continues to one next node.</p>}
+				{fields.map((field, index) => (
+					<div
+						key={field.id}
+						className={styles.choiceRow}
+					>
 						<FormField
-							key={choice.id}
 							label={`Choice ${index + 1}`}
 							registration={register(`choices.${index}.label`)}
 							error={errors.choices?.[index]?.label?.message}
 						/>
-					))}
-				</fieldset>
-			)}
+						<button
+							type='button'
+							className={styles.secondaryButton}
+							aria-label={`Remove choice ${index + 1}`}
+							onClick={() => handleRemoveChoice(index)}
+						>
+							Remove
+						</button>
+					</div>
+				))}
+				<button
+					ref={addChoiceRef}
+					type='button'
+					className={styles.secondaryButton}
+					onClick={() => append({ choiceId: crypto.randomUUID(), label: '' })}
+				>
+					Add choice
+				</button>
+			</fieldset>
 
 			<SaveActions saved={isSubmitSuccessful && !isDirty} />
 		</form>
