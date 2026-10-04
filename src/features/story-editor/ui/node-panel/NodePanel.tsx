@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import type { StoryNodePatch } from '@/entities/story/model/story-operations';
 import type { StoryNode } from '@/entities/story/model/types';
 import { EndingNodeForm } from './EndingNodeForm';
@@ -8,7 +8,9 @@ import styles from './NodePanel.module.scss';
 
 type NodePanelProps = {
 	node: StoryNode | undefined;
+	autoFocusTitle: boolean;
 	onSave: (nodeId: string, patch: StoryNodePatch) => void;
+	onDelete: (nodeId: string) => void;
 };
 
 const headings = {
@@ -17,8 +19,34 @@ const headings = {
 	ending: 'Edit ending',
 } satisfies Record<StoryNode['type'], string>;
 
-export function NodePanel({ node, onSave }: NodePanelProps) {
+const deleteLabels = {
+	start: 'Delete start',
+	scene: 'Delete scene',
+	ending: 'Delete ending',
+} satisfies Record<StoryNode['type'], string>;
+
+export function NodePanel({ node, autoFocusTitle, onSave, onDelete }: NodePanelProps) {
 	const headingId = useId();
+	const headingRef = useRef<HTMLHeadingElement>(null);
+	const shouldFocusHeading = useRef(false);
+
+	useEffect(() => {
+		if (!shouldFocusHeading.current) {
+			return;
+		}
+
+		shouldFocusHeading.current = false;
+		headingRef.current?.focus();
+	}, [node]);
+
+	const handleDelete = (nodeToDelete: StoryNode) => {
+		if (!window.confirm(`Delete "${nodeToDelete.title}" and its connections?`)) {
+			return;
+		}
+
+		shouldFocusHeading.current = true;
+		onDelete(nodeToDelete.id);
+	};
 
 	return (
 		<aside
@@ -26,18 +54,30 @@ export function NodePanel({ node, onSave }: NodePanelProps) {
 			aria-labelledby={headingId}
 		>
 			<h2
+				ref={headingRef}
 				id={headingId}
+				tabIndex={-1}
 				className={styles.heading}
 			>
 				{node ? headings[node.type] : 'Node details'}
 			</h2>
 
 			{node ? (
-				<NodeForm
-					key={node.id}
-					node={node}
-					onSave={(patch) => onSave(node.id, patch)}
-				/>
+				<>
+					<NodeForm
+						key={node.id}
+						node={node}
+						autoFocusTitle={autoFocusTitle}
+						onSave={(patch) => onSave(node.id, patch)}
+					/>
+					<button
+						type='button'
+						className={styles.delete}
+						onClick={() => handleDelete(node)}
+					>
+						{deleteLabels[node.type]}
+					</button>
+				</>
 			) : (
 				<p className={styles.empty}>Select a node on the graph to edit it.</p>
 			)}
@@ -47,15 +87,17 @@ export function NodePanel({ node, onSave }: NodePanelProps) {
 
 type NodeFormProps = {
 	node: StoryNode;
+	autoFocusTitle: boolean;
 	onSave: (patch: StoryNodePatch) => void;
 };
 
-function NodeForm({ node, onSave }: NodeFormProps) {
+function NodeForm({ node, autoFocusTitle, onSave }: NodeFormProps) {
 	switch (node.type) {
 		case 'start':
 			return (
 				<StartNodeForm
 					node={node}
+					autoFocusTitle={autoFocusTitle}
 					onSave={onSave}
 				/>
 			);
@@ -63,6 +105,7 @@ function NodeForm({ node, onSave }: NodeFormProps) {
 			return (
 				<SceneNodeForm
 					node={node}
+					autoFocusTitle={autoFocusTitle}
 					onSave={onSave}
 				/>
 			);
@@ -70,6 +113,7 @@ function NodeForm({ node, onSave }: NodeFormProps) {
 			return (
 				<EndingNodeForm
 					node={node}
+					autoFocusTitle={autoFocusTitle}
 					onSave={onSave}
 				/>
 			);

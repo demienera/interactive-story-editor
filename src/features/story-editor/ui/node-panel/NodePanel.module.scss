@@ -103,3 +103,19 @@
 	color: var(--color-text-muted);
 	font-size: 14px;
 }
+
+.delete {
+	min-height: 40px;
+	margin-top: 24px;
+	padding: 8px 20px;
+	border: 1px solid var(--color-danger);
+	border-radius: var(--radius-pill);
+	background: transparent;
+	color: var(--color-danger);
+	font: 600 14px/1 var(--font-ui);
+	cursor: pointer;
+
+	&:hover {
+		background: var(--color-surface-raised);
+	}
+}
