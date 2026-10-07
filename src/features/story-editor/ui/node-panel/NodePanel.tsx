@@ -11,6 +11,7 @@ import styles from './NodePanel.module.scss';
 type NodePanelProps = {
 	story: Story;
 	node: StoryNode | undefined;
+	formKey: string;
 	autoFocusTitle: boolean;
 	onSave: (nodeId: string, patch: StoryNodePatch) => void;
 	onDelete: (nodeId: string) => void;
@@ -29,7 +30,7 @@ const deleteLabels = {
 	ending: 'Delete ending',
 } satisfies Record<StoryNode['type'], string>;
 
-export function NodePanel({ story, node, autoFocusTitle, onSave, onDelete, onExitChange }: NodePanelProps) {
+export function NodePanel({ story, node, formKey, autoFocusTitle, onSave, onDelete, onExitChange }: NodePanelProps) {
 	const headingId = useId();
 	const headingRef = useRef<HTMLHeadingElement>(null);
 	const shouldFocusHeading = useRef(false);
@@ -43,13 +44,9 @@ export function NodePanel({ story, node, autoFocusTitle, onSave, onDelete, onExi
 		headingRef.current?.focus();
 	}, [node]);
 
-	const handleDelete = (nodeToDelete: StoryNode) => {
-		if (!window.confirm(`Delete "${nodeToDelete.title}" and its connections?`)) {
-			return;
-		}
-
+	const handleDelete = (nodeId: string) => {
 		shouldFocusHeading.current = true;
-		onDelete(nodeToDelete.id);
+		onDelete(nodeId);
 	};
 
 	return (
@@ -69,7 +66,7 @@ export function NodePanel({ story, node, autoFocusTitle, onSave, onDelete, onExi
 			{node ? (
 				<>
 					<NodeForm
-						key={node.id}
+						key={formKey}
 						node={node}
 						autoFocusTitle={autoFocusTitle}
 						onSave={(patch) => onSave(node.id, patch)}
@@ -82,7 +79,7 @@ export function NodePanel({ story, node, autoFocusTitle, onSave, onDelete, onExi
 					<button
 						type='button'
 						className={styles.delete}
-						onClick={() => handleDelete(node)}
+						onClick={() => handleDelete(node.id)}
 					>
 						{deleteLabels[node.type]}
 					</button>
