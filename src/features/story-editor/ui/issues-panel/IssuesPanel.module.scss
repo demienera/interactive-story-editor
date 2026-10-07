@@ -1,0 +1,87 @@
+.panel {
+	display: grid;
+	gap: 8px;
+	padding: 20px clamp(16px, 3vw, 24px);
+	border-bottom: 1px solid var(--color-divider);
+}
+
+.heading {
+	margin: 0;
+	font-family: var(--font-story);
+	font-size: 20px;
+	font-weight: 600;
+}
+
+.summary {
+	margin: 0;
+	color: var(--color-text-muted);
+	font-size: 14px;
+}
+
+.details {
+	display: grid;
+	gap: 8px;
+}
+
+.toggle {
+	justify-self: start;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+.list {
+	display: grid;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.issue {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	align-items: baseline;
+	gap: 8px;
+	margin: 0;
+	font-size: 14px;
+}
+
+.severity {
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.error {
+	color: var(--color-danger);
+}
+
+.warning {
+	color: var(--color-text-muted);
+}
+
+.message {
+	line-height: 1.4;
+}
+
+.issueButton {
+	width: 100%;
+	padding: 0;
+	border: none;
+	background: none;
+	color: var(--color-text);
+	font-family: inherit;
+	text-align: start;
+	cursor: pointer;
+
+	.message {
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	&:hover .message {
+		color: var(--color-accent);
+	}
+}

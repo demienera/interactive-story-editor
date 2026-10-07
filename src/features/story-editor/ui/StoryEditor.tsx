@@ -31,6 +31,7 @@ import {
 	type Exit,
 } from '../lib/transitions';
 import { edgeTypes } from './edges/edge-types';
+import { IssuesPanel } from './issues-panel/IssuesPanel';
 import { NodePanel } from './node-panel/NodePanel';
 import { nodeTypes } from './nodes/node-types';
 import '@xyflow/react/dist/style.css';
@@ -240,6 +241,15 @@ export function StoryEditor() {
 		setStatusMessage(`${action}. Press Undo to restore.`);
 	};
 
+	const handleSelectNode = (nodeId: string) => {
+		const node = getNode(story, nodeId);
+
+		setSelectedNodeId(nodeId);
+		setCreatedNodeId(null);
+		flowInstance.current?.fitView({ nodes: [{ id: nodeId }], duration: 300, maxZoom: 1 });
+		setStatusMessage(node ? `${typeLabels[node.type]} "${node.title}" selected` : '');
+	};
+
 	const isFocusInCanvas = async () => canvasRef.current?.contains(document.activeElement) ?? false;
 
 	const handleKeyboardDelete = ({ nodes: deletedNodes }: { nodes: StoryFlowNode[] }) => {
@@ -347,15 +357,21 @@ export function StoryEditor() {
 					</ReactFlow>
 				</section>
 
-				<NodePanel
-					story={story}
-					node={selectedNode}
-					formKey={selectedNode ? `${selectedNode.id}-${restoreCount}` : ''}
-					autoFocusTitle={selectedNodeId !== null && selectedNodeId === createdNodeId}
-					onSave={handleSave}
-					onDelete={handleDeleteNode}
-					onExitChange={handleExitChange}
-				/>
+				<div className={styles.sidebar}>
+					<IssuesPanel
+						story={story}
+						onSelectNode={handleSelectNode}
+					/>
+					<NodePanel
+						story={story}
+						node={selectedNode}
+						formKey={selectedNode ? `${selectedNode.id}-${restoreCount}` : ''}
+						autoFocusTitle={selectedNodeId !== null && selectedNodeId === createdNodeId}
+						onSave={handleSave}
+						onDelete={handleDeleteNode}
+						onExitChange={handleExitChange}
+					/>
+				</div>
 			</main>
 
 			<p

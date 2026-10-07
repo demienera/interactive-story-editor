@@ -122,6 +122,18 @@
 	}
 }
 
+.sidebar {
+	min-height: 0;
+	overflow-y: auto;
+	border-left: 1px solid var(--color-divider);
+	background: var(--color-surface);
+
+	@media (max-width: 899px) {
+		border-top: 1px solid var(--color-divider);
+		border-left: none;
+	}
+}
+
 .addPanel {
 	display: flex;
 	flex-wrap: wrap;
