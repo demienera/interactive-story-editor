@@ -1,6 +1,6 @@
-import type { Story } from '../model/types';
+import type { Story } from '../../model/types';
 
-export const demoStory: Story = {
+export const whisperingForest: Story = {
 	id: 'whispering-forest',
 	title: 'The Whispering Forest',
 	description: 'A short branching story about a mysterious forest.',

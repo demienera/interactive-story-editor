@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { demoStory } from '../data/demo-story';
+import { whisperingForest } from '../data/examples/whispering-forest';
 import { addNode } from './story-operations';
 import type { Story, StoryEdge, StoryNode } from './types';
 import { validateStory } from './validate-story';
@@ -50,7 +50,7 @@ describe('validateStory', () => {
 	});
 
 	test('returns no issues for the demo story', () => {
-		expect(validateStory(demoStory)).toEqual([]);
+		expect(validateStory(whisperingForest)).toEqual([]);
 	});
 
 	describe('start node', () => {

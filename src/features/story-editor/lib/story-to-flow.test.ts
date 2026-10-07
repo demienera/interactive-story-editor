@@ -1,28 +1,28 @@
 import { MarkerType } from '@xyflow/react';
 import { describe, expect, test } from 'vitest';
-import { demoStory } from '@/entities/story/data/demo-story';
+import { whisperingForest } from '@/entities/story/data/examples/whispering-forest';
 import type { Story } from '@/entities/story/model/types';
 import { layoutByDepth } from './auto-layout';
 import { storyToFlow } from './story-to-flow';
 
 describe('storyToFlow', () => {
-	const layout = layoutByDepth(demoStory);
+	const layout = layoutByDepth(whisperingForest);
 
 	test('converts story nodes to flow nodes with the domain node as data', () => {
-		const { nodes } = storyToFlow(demoStory, layout);
+		const { nodes } = storyToFlow(whisperingForest, layout);
 
-		expect(nodes).toHaveLength(demoStory.nodes.length);
-		expect(nodes[0]).toMatchObject({ id: 'start', type: 'start', data: { node: demoStory.nodes[0] } });
+		expect(nodes).toHaveLength(whisperingForest.nodes.length);
+		expect(nodes[0]).toMatchObject({ id: 'start', type: 'start', data: { node: whisperingForest.nodes[0] } });
 	});
 
 	test('uses the domain node type as the flow node type', () => {
-		const { nodes } = storyToFlow(demoStory, layout);
+		const { nodes } = storyToFlow(whisperingForest, layout);
 
-		expect(nodes.map((node) => node.type)).toEqual(demoStory.nodes.map((node) => node.type));
+		expect(nodes.map((node) => node.type)).toEqual(whisperingForest.nodes.map((node) => node.type));
 	});
 
 	test('describes nodes with an accessible label', () => {
-		const { nodes } = storyToFlow(demoStory, layout);
+		const { nodes } = storyToFlow(whisperingForest, layout);
 
 		expect(nodes.find((node) => node.id === 'forest')?.ariaLabel).toBe('Scene: The Forest, 2 choices');
 		expect(nodes.find((node) => node.id === 'whisper')?.ariaLabel).toBe('Scene: The Whisper');
@@ -31,7 +31,7 @@ describe('storyToFlow', () => {
 
 	test('uses the singular for a scene with one choice', () => {
 		const story: Story = {
-			...demoStory,
+			...whisperingForest,
 			nodes: [{ id: 'gate', type: 'scene', title: 'The Gate', text: '', choices: [{ id: 'open', label: 'Open' }] }],
 		};
 
@@ -39,9 +39,9 @@ describe('storyToFlow', () => {
 	});
 
 	test('converts continue edges without a source handle', () => {
-		const { edges } = storyToFlow(demoStory, layout);
+		const { edges } = storyToFlow(whisperingForest, layout);
 
-		expect(edges).toHaveLength(demoStory.edges.length);
+		expect(edges).toHaveLength(whisperingForest.edges.length);
 		expect(edges).toContainEqual({
 			id: 'start-to-forest',
 			source: 'start',
@@ -53,7 +53,7 @@ describe('storyToFlow', () => {
 	});
 
 	test('connects choice edges to the handle of their choice', () => {
-		const { edges } = storyToFlow(demoStory, layout);
+		const { edges } = storyToFlow(whisperingForest, layout);
 
 		expect(edges.find((edge) => edge.id === 'forest-to-whisper')).toMatchObject({
 			source: 'forest',
@@ -63,7 +63,7 @@ describe('storyToFlow', () => {
 	});
 
 	test('describes choice edges with the choice label and node titles', () => {
-		const { edges } = storyToFlow(demoStory, layout);
+		const { edges } = storyToFlow(whisperingForest, layout);
 
 		expect(edges.find((edge) => edge.id === 'forest-to-whisper')?.ariaLabel).toBe(
 			'Choice "Follow the whisper" from The Forest to The Whisper',
@@ -72,7 +72,7 @@ describe('storyToFlow', () => {
 
 	test('falls back to the choice id when the choice does not exist', () => {
 		const story: Story = {
-			...demoStory,
+			...whisperingForest,
 			edges: [{ id: 'broken', type: 'choice', source: 'forest', target: 'whisper', choiceId: 'missing' }],
 		};
 
@@ -82,7 +82,7 @@ describe('storyToFlow', () => {
 	});
 
 	test('takes node positions from the layout', () => {
-		const { nodes } = storyToFlow(demoStory, { start: { x: 10, y: 20 } });
+		const { nodes } = storyToFlow(whisperingForest, { start: { x: 10, y: 20 } });
 
 		expect(nodes.find((node) => node.id === 'start')?.position).toEqual({ x: 10, y: 20 });
 	});

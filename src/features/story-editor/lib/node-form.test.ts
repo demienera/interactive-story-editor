@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { demoStory } from '@/entities/story/data/demo-story';
+import { whisperingForest } from '@/entities/story/data/examples/whispering-forest';
 import { updateNode } from '@/entities/story/model/story-operations';
 import type { SceneNode } from '@/entities/story/model/types';
 import { validateStory } from '@/entities/story/model/validate-story';
@@ -112,16 +112,16 @@ describe('scene form mapping', () => {
 	});
 
 	test('a saved scene keeps its edges and the story stays valid', () => {
-		const forest = demoStory.nodes.find((node) => node.id === 'forest');
+		const forest = whisperingForest.nodes.find((node) => node.id === 'forest');
 
 		if (forest?.type !== 'scene') {
 			throw new Error('The demo story must have a "forest" scene.');
 		}
 
 		const values = { ...toSceneFormValues(forest), title: 'The Dark Forest' };
-		const story = updateNode(demoStory, forest.id, toScenePatch(values));
+		const story = updateNode(whisperingForest, forest.id, toScenePatch(values));
 
-		expect(story.edges).toEqual(demoStory.edges);
+		expect(story.edges).toEqual(whisperingForest.edges);
 		expect(validateStory(story)).toEqual([]);
 	});
 });

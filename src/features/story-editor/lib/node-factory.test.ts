@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { demoStory } from '@/entities/story/data/demo-story';
+import { whisperingForest } from '@/entities/story/data/examples/whispering-forest';
 import { addNode } from '@/entities/story/model/story-operations';
 import { validateStory } from '@/entities/story/model/validate-story';
 import { createNode } from './node-factory';
@@ -29,7 +29,7 @@ describe('createNode', () => {
 	});
 
 	test('a new scene is added to the story and reported until it is connected', () => {
-		const story = addNode(demoStory, createNode('scene', 'new-scene'));
+		const story = addNode(whisperingForest, createNode('scene', 'new-scene'));
 
 		expect(validateStory(story)).toEqual([
 			{ code: 'dead-end', severity: 'error', nodeId: 'new-scene' },

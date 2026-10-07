@@ -1,0 +1,77 @@
+import type { Story } from '../../model/types';
+
+export const lanternFerry: Story = {
+	id: 'lantern-ferry',
+	title: 'The Lantern Ferry',
+	description: 'Two roads lead to the same dark river, and the ferryman asks for more than a coin.',
+	nodes: [
+		{
+			id: 'start',
+			type: 'start',
+			title: 'Start',
+		},
+		{
+			id: 'crossroads',
+			type: 'scene',
+			title: 'The Crossroads',
+			text: 'A letter in your pocket says only: "Cross the river before the lanterns go out." Two paths lead down to the water.',
+			choices: [
+				{ id: 'take-reeds', label: 'Take the path through the reeds' },
+				{ id: 'take-stairs', label: 'Climb down the old stone stairs' },
+			],
+		},
+		{
+			id: 'reeds',
+			type: 'scene',
+			title: 'The Reeds',
+			text: 'The reeds are taller than you. Fireflies drift between them and lead you, one by one, toward a single lantern on the shore.',
+			choices: [],
+		},
+		{
+			id: 'stairs',
+			type: 'scene',
+			title: 'The Stone Stairs',
+			text: 'The stairs are slick with moss. Someone has carved names into every step, and the last one is still fresh.',
+			choices: [],
+		},
+		{
+			id: 'ferry',
+			type: 'scene',
+			title: 'The Ferryman',
+			text: 'A narrow boat waits at the pier. The ferryman raises his lantern to your face. "Every crossing has a price," he says.',
+			choices: [
+				{ id: 'pay-coin', label: 'Pay with the silver coin' },
+				{ id: 'offer-name', label: 'Offer your name instead' },
+			],
+		},
+		{
+			id: 'crossing',
+			type: 'scene',
+			title: 'The Crossing',
+			text: 'The coin sinks without a sound. Halfway across, the lanterns on the far shore light up one after another, as if someone has been waiting.',
+			choices: [],
+		},
+		{
+			id: 'far-shore',
+			type: 'ending',
+			title: 'The Far Shore',
+			text: 'An old woman meets you on the pier and takes the letter from your hand. "You came in time," she says, and blows out the last lantern.',
+		},
+		{
+			id: 'nameless',
+			type: 'ending',
+			title: 'The Nameless Traveller',
+			text: 'The ferryman smiles and writes your name on a fresh step. You cross the river lightly, and you no longer remember why you came.',
+		},
+	],
+	edges: [
+		{ id: 'start-to-crossroads', type: 'continue', source: 'start', target: 'crossroads' },
+		{ id: 'crossroads-to-reeds', type: 'choice', source: 'crossroads', target: 'reeds', choiceId: 'take-reeds' },
+		{ id: 'crossroads-to-stairs', type: 'choice', source: 'crossroads', target: 'stairs', choiceId: 'take-stairs' },
+		{ id: 'reeds-to-ferry', type: 'continue', source: 'reeds', target: 'ferry' },
+		{ id: 'stairs-to-ferry', type: 'continue', source: 'stairs', target: 'ferry' },
+		{ id: 'ferry-to-crossing', type: 'choice', source: 'ferry', target: 'crossing', choiceId: 'pay-coin' },
+		{ id: 'ferry-to-nameless', type: 'choice', source: 'ferry', target: 'nameless', choiceId: 'offer-name' },
+		{ id: 'crossing-to-far-shore', type: 'continue', source: 'crossing', target: 'far-shore' },
+	],
+};
