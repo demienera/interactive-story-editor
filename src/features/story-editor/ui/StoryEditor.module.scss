@@ -80,6 +80,10 @@
 	width: 100%;
 	height: 100%;
 
+	&:focus {
+		outline: none;
+	}
+
 	// React Flow reads these variables; mapping them to our tokens keeps the graph in the current theme.
 	--xy-background-color: var(--color-canvas);
 	--xy-background-pattern-color: var(--color-canvas-dot);

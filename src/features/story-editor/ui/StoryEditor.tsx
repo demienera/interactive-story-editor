@@ -37,7 +37,9 @@ import '@xyflow/react/dist/style.css';
 import styles from './StoryEditor.module.scss';
 
 const NODE_DESCRIPTION =
-	'Press Enter or Space to select the node and edit it in the panel. Use the arrow keys to move a selected node. Press Escape to clear the selection.';
+	'Press Enter or Space to select the node and edit it in the panel. Use the arrow keys to move a selected node. Press Delete to delete it. Press Escape to clear the selection.';
+
+const DELETE_KEYS = ['Delete', 'Backspace'];
 
 const ariaLabelConfig: Partial<AriaLabelConfig> = {
 	'node.a11yDescription.default': NODE_DESCRIPTION,
@@ -79,7 +81,7 @@ export function StoryEditor() {
 	const [createdNodeId, setCreatedNodeId] = useState<string | null>(null);
 	const [statusMessage, setStatusMessage] = useState('');
 	const [restoreCount, setRestoreCount] = useState(0);
-	const canvasRef = useRef<HTMLDivElement>(null);
+	const canvasRef = useRef<HTMLElement>(null);
 	const flowInstance = useRef<ReactFlowInstance<StoryFlowNode, Edge> | null>(null);
 
 	const story = history.present.story;
@@ -230,13 +232,22 @@ export function StoryEditor() {
 
 	const handleDeleteNode = (nodeId: string) => {
 		const node = getNode(story, nodeId);
-
 		const action = node ? `${typeLabels[node.type]} "${node.title}" deleted` : 'Node deleted';
 
 		commit((current) => removeNode(current, nodeId), action);
 		setSelectedNodeId(null);
 		setCreatedNodeId(null);
 		setStatusMessage(`${action}. Press Undo to restore.`);
+	};
+
+	const isFocusInCanvas = async () => canvasRef.current?.contains(document.activeElement) ?? false;
+
+	const handleKeyboardDelete = ({ nodes: deletedNodes }: { nodes: StoryFlowNode[] }) => {
+		canvasRef.current?.focus();
+
+		for (const node of deletedNodes) {
+			handleDeleteNode(node.id);
+		}
 	};
 
 	return (
@@ -280,9 +291,11 @@ export function StoryEditor() {
 			</header>
 
 			<main className={styles.workspace}>
-				<div
+				<section
 					ref={canvasRef}
 					className={styles.canvas}
+					aria-label='Story graph'
+					tabIndex={-1}
 				>
 					<ReactFlow
 						nodes={nodes}
@@ -295,7 +308,9 @@ export function StoryEditor() {
 						}}
 						onConnect={handleConnect}
 						isValidConnection={isValidConnection}
-						deleteKeyCode={null}
+						deleteKeyCode={DELETE_KEYS}
+						onBeforeDelete={isFocusInCanvas}
+						onDelete={handleKeyboardDelete}
 						ariaLabelConfig={ariaLabelConfig}
 						fitView
 					>
@@ -330,7 +345,7 @@ export function StoryEditor() {
 						<Background />
 						<Controls />
 					</ReactFlow>
-				</div>
+				</section>
 
 				<NodePanel
 					story={story}
