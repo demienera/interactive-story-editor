@@ -43,6 +43,25 @@
 	}
 }
 
+.history {
+	display: flex;
+	gap: 8px;
+
+	.control {
+		background: transparent;
+		cursor: pointer;
+	}
+
+	.control[aria-disabled='true'] {
+		color: var(--color-text-muted);
+		cursor: not-allowed;
+
+		&:hover {
+			background: transparent;
+		}
+	}
+}
+
 .workspace {
 	min-height: 0;
 	display: grid;

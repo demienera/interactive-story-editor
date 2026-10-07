@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import {
 	Background,
 	Controls,
@@ -19,13 +19,8 @@ import { getNode } from '@/entities/story/model/story-engine';
 import { addNode, removeNode, type StoryNodePatch } from '@/entities/story/model/story-operations';
 import type { Story, StoryNodeType } from '@/entities/story/model/types';
 import { layoutByDepth } from '../lib/auto-layout';
-import {
-	applyPositionChanges,
-	applySizeChanges,
-	removeNodeFromLayout,
-	type EditorLayout,
-	type NodeSizes,
-} from '../lib/editor-layout';
+import { applyPositionChanges, applySizeChanges, type EditorLayout, type NodeSizes } from '../lib/editor-layout';
+import { createHistory, pushHistory, redo, undo, type History } from '../lib/history';
 import { createNode } from '../lib/node-factory';
 import { storyToFlow, type StoryFlowNode } from '../lib/story-to-flow';
 import {
@@ -60,16 +55,36 @@ const typeLabels = {
 	ending: 'Ending',
 } satisfies Record<StoryNodeType, string>;
 
+type StoryRevision = {
+	story: Story;
+	action: string;
+};
+
+function isTextInput(target: EventTarget | null): boolean {
+	return (
+		target instanceof HTMLInputElement ||
+		target instanceof HTMLTextAreaElement ||
+		target instanceof HTMLSelectElement ||
+		(target instanceof HTMLElement && target.isContentEditable)
+	);
+}
+
 export function StoryEditor() {
-	const [story, setStory] = useState<Story>(demoStory);
+	const [history, setHistory] = useState<History<StoryRevision>>(() =>
+		createHistory({ story: demoStory, action: '' }),
+	);
 	const [layout, setLayout] = useState<EditorLayout>(() => layoutByDepth(demoStory));
 	const [nodeSizes, setNodeSizes] = useState<NodeSizes>({});
 	const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 	const [createdNodeId, setCreatedNodeId] = useState<string | null>(null);
 	const [statusMessage, setStatusMessage] = useState('');
+	const [restoreCount, setRestoreCount] = useState(0);
 	const canvasRef = useRef<HTMLDivElement>(null);
 	const flowInstance = useRef<ReactFlowInstance<StoryFlowNode, Edge> | null>(null);
 
+	const story = history.present.story;
+	const canUndo = history.past.length > 0;
+	const canRedo = history.future.length > 0;
 	const flow = useMemo(() => storyToFlow(story, layout), [story, layout]);
 	const nodes = useMemo<StoryFlowNode[]>(
 		() =>
@@ -82,6 +97,61 @@ export function StoryEditor() {
 	);
 	const selectedNode = selectedNodeId ? getNode(story, selectedNodeId) : undefined;
 	const hasStartNode = story.nodes.some((node) => node.type === 'start');
+
+	const commit = (update: (current: Story) => Story, action: string) => {
+		setHistory((current) => {
+			const next = update(current.present.story);
+
+			return next === current.present.story ? current : pushHistory(current, { story: next, action });
+		});
+	};
+
+	const restore = (next: History<StoryRevision>, message: string) => {
+		setHistory(next);
+		setCreatedNodeId(null);
+		setSelectedNodeId((current) => (current && getNode(next.present.story, current) ? current : null));
+		setRestoreCount((count) => count + 1);
+		setStatusMessage(message);
+	};
+
+	const handleUndo = () => {
+		if (canUndo) {
+			restore(undo(history), `Undone: ${history.present.action}`);
+		}
+	};
+
+	const handleRedo = () => {
+		if (canRedo) {
+			restore(redo(history), `Redone: ${history.future[0].action}`);
+		}
+	};
+
+	const handleHistoryShortcut = useEffectEvent((event: KeyboardEvent) => {
+		if (!(event.ctrlKey || event.metaKey) || event.altKey || event.defaultPrevented || isTextInput(event.target)) {
+			return;
+		}
+
+		const isUndo = event.code === 'KeyZ' && !event.shiftKey;
+		const isRedo = (event.code === 'KeyZ' && event.shiftKey) || (event.code === 'KeyY' && !event.shiftKey);
+
+		if (!isUndo && !isRedo) {
+			return;
+		}
+
+		event.preventDefault();
+
+		if (isUndo) {
+			handleUndo();
+		} else {
+			handleRedo();
+		}
+	});
+
+	useEffect(() => {
+		document.addEventListener('keydown', handleHistoryShortcut);
+
+		return () => document.removeEventListener('keydown', handleHistoryShortcut);
+	}, []);
 
 	const handleNodesChange = (changes: NodeChange<StoryFlowNode>[]) => {
 		setLayout((current) => applyPositionChanges(current, changes));
@@ -122,22 +192,29 @@ export function StoryEditor() {
 		const node = createNode(type, crypto.randomUUID());
 		const position = getNewNodePosition();
 
-		setStory((current) => addNode(current, node));
+		const message = `${typeLabels[type]} added`;
+
+		commit((current) => addNode(current, node), message);
 		setLayout((current) => ({ ...current, [node.id]: position }));
 		setSelectedNodeId(node.id);
 		setCreatedNodeId(node.id);
-		setStatusMessage(`${typeLabels[type]} added`);
+		setStatusMessage(message);
 	};
 
 	const handleSave = (nodeId: string, patch: StoryNodePatch) => {
-		setStory((current) => updateNodeAndExits(current, nodeId, patch));
+		const node = getNode(story, nodeId);
+		const action = node ? `${typeLabels[node.type]} "${patch.title ?? node.title}" edited` : 'Node edited';
+
+		commit((current) => updateNodeAndExits(current, nodeId, patch), action);
 	};
 
 	const handleExitChange = (exit: Exit, targetId: string | null) => {
 		const target = targetId ? getNode(story, targetId) : undefined;
 
-		setStory((current) => setExitTarget(current, exit, targetId, crypto.randomUUID()));
-		setStatusMessage(target ? `Connected to "${target.title}"` : 'Connection removed');
+		const message = target ? `Connected to "${target.title}"` : 'Connection removed';
+
+		commit((current) => setExitTarget(current, exit, targetId, crypto.randomUUID()), message);
+		setStatusMessage(message);
 	};
 
 	const handleConnect = (connection: Connection) => {
@@ -154,12 +231,12 @@ export function StoryEditor() {
 	const handleDeleteNode = (nodeId: string) => {
 		const node = getNode(story, nodeId);
 
-		setStory((current) => removeNode(current, nodeId));
-		setLayout((current) => removeNodeFromLayout(current, nodeId));
-		setNodeSizes((current) => removeNodeFromLayout(current, nodeId));
+		const action = node ? `${typeLabels[node.type]} "${node.title}" deleted` : 'Node deleted';
+
+		commit((current) => removeNode(current, nodeId), action);
 		setSelectedNodeId(null);
 		setCreatedNodeId(null);
-		setStatusMessage(node ? `${typeLabels[node.type]} "${node.title}" deleted` : '');
+		setStatusMessage(`${action}. Press Undo to restore.`);
 	};
 
 	return (
@@ -174,6 +251,26 @@ export function StoryEditor() {
 					</Link>
 				</nav>
 				<h1 className={styles.title}>{story.title}</h1>
+				<div className={styles.history}>
+					<button
+						type='button'
+						className={styles.control}
+						aria-disabled={!canUndo}
+						aria-keyshortcuts='Control+Z Meta+Z'
+						onClick={handleUndo}
+					>
+						Undo
+					</button>
+					<button
+						type='button'
+						className={styles.control}
+						aria-disabled={!canRedo}
+						aria-keyshortcuts='Control+Shift+Z Meta+Shift+Z Control+Y'
+						onClick={handleRedo}
+					>
+						Redo
+					</button>
+				</div>
 				<Link
 					href='/play'
 					className={styles.control}
@@ -238,6 +335,7 @@ export function StoryEditor() {
 				<NodePanel
 					story={story}
 					node={selectedNode}
+					formKey={selectedNode ? `${selectedNode.id}-${restoreCount}` : ''}
 					autoFocusTitle={selectedNodeId !== null && selectedNodeId === createdNodeId}
 					onSave={handleSave}
 					onDelete={handleDeleteNode}
