@@ -1,6 +1,6 @@
 import type { NodeChange } from '@xyflow/react';
 import { describe, expect, test } from 'vitest';
-import { applyPositionChanges, applySizeChanges, removeNodeFromLayout, type EditorLayout } from './editor-layout';
+import { applyPositionChanges, applySizeChanges, type EditorLayout } from './editor-layout';
 
 function createLayout(): EditorLayout {
 	return {
@@ -74,26 +74,5 @@ describe('applySizeChanges', () => {
 		];
 
 		expect(applySizeChanges(sizes, changes)).toBe(sizes);
-	});
-});
-
-describe('removeNodeFromLayout', () => {
-	test('removes only the deleted node', () => {
-		expect(removeNodeFromLayout(createLayout(), 'gate')).toEqual({ start: { x: 0, y: 0 } });
-	});
-
-	test('does not mutate the original record', () => {
-		const layout = createLayout();
-		const before = structuredClone(layout);
-
-		removeNodeFromLayout(layout, 'gate');
-
-		expect(layout).toEqual(before);
-	});
-
-	test('returns the same record when the node has no entry', () => {
-		const layout = createLayout();
-
-		expect(removeNodeFromLayout(layout, 'unknown')).toBe(layout);
 	});
 });

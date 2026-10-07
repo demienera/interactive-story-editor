@@ -42,14 +42,3 @@ export function applySizeChanges<NodeType extends Node>(sizes: NodeSizes, change
 
 	return nextSizes;
 }
-
-export function removeNodeFromLayout<T>(record: Record<string, T>, nodeId: string): Record<string, T> {
-	if (!(nodeId in record)) {
-		return record;
-	}
-
-	const next = { ...record };
-	delete next[nodeId];
-
-	return next;
-}
