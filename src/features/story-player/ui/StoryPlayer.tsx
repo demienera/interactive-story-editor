@@ -3,14 +3,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { demoStory } from '@/entities/story/data/demo-story';
 import { getNextNode, getNextNodeByChoice, getStartNode } from '@/entities/story/model/story-engine';
-import type { StoryNode } from '@/entities/story/model/types';
+import type { Story, StoryNode } from '@/entities/story/model/types';
 import playerBackground from '../../../../public/bg.jpg';
 import styles from './StoryPlayer.module.scss';
 
-export function StoryPlayer() {
-	const [currentNode, setCurrentNode] = useState<StoryNode | undefined>(getStartNode(demoStory));
+type StoryPlayerProps = {
+	story: Story;
+};
+
+export function StoryPlayer({ story }: StoryPlayerProps) {
+	const [currentNode, setCurrentNode] = useState<StoryNode | undefined>(getStartNode(story));
 	const titleRef = useRef<HTMLHeadingElement>(null);
 	const shouldFocusTitle = useRef(false);
 
@@ -33,15 +36,15 @@ export function StoryPlayer() {
 	};
 
 	const handleContinue = () => {
-		goTo(getNextNode(demoStory, currentNode.id));
+		goTo(getNextNode(story, currentNode.id));
 	};
 
 	const handleChoice = (choiceId: string) => {
-		goTo(getNextNodeByChoice(demoStory, currentNode.id, choiceId));
+		goTo(getNextNodeByChoice(story, currentNode.id, choiceId));
 	};
 
 	const handleRestart = () => {
-		goTo(getStartNode(demoStory));
+		goTo(getStartNode(story));
 	};
 
 	return (
@@ -77,7 +80,7 @@ export function StoryPlayer() {
 
 			<main className={styles.player}>
 				<div className={styles.card}>
-					<p className={styles.storyTitle}>{demoStory.title}</p>
+					<p className={styles.storyTitle}>{story.title}</p>
 
 					<h1
 						ref={titleRef}

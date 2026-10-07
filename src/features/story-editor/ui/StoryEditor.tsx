@@ -14,7 +14,6 @@ import {
 	type ReactFlowInstance,
 	type XYPosition,
 } from '@xyflow/react';
-import { demoStory } from '@/entities/story/data/demo-story';
 import { getNode } from '@/entities/story/model/story-engine';
 import { addNode, removeNode, type StoryNodePatch } from '@/entities/story/model/story-operations';
 import type { Story, StoryNodeType } from '@/entities/story/model/types';
@@ -72,11 +71,15 @@ function isTextInput(target: EventTarget | null): boolean {
 	);
 }
 
-export function StoryEditor() {
+type StoryEditorProps = {
+	initialStory: Story;
+};
+
+export function StoryEditor({ initialStory }: StoryEditorProps) {
 	const [history, setHistory] = useState<History<StoryRevision>>(() =>
-		createHistory({ story: demoStory, action: '' }),
+		createHistory({ story: initialStory, action: '' }),
 	);
-	const [layout, setLayout] = useState<EditorLayout>(() => layoutByDepth(demoStory));
+	const [layout, setLayout] = useState<EditorLayout>(() => layoutByDepth(initialStory));
 	const [nodeSizes, setNodeSizes] = useState<NodeSizes>({});
 	const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 	const [createdNodeId, setCreatedNodeId] = useState<string | null>(null);
@@ -293,7 +296,7 @@ export function StoryEditor() {
 					</button>
 				</div>
 				<Link
-					href='/play'
+					href={`/play/${story.id}`}
 					className={styles.control}
 				>
 					Play story
