@@ -15,7 +15,13 @@ import {
 	type XYPosition,
 } from '@xyflow/react';
 import { getNode } from '@/entities/story/model/story-engine';
-import { addNode, removeNode, type StoryNodePatch } from '@/entities/story/model/story-operations';
+import {
+	addNode,
+	removeNode,
+	updateStoryDetails,
+	type StoryDetailsPatch,
+	type StoryNodePatch,
+} from '@/entities/story/model/story-operations';
 import type { Story, StoryNodeType } from '@/entities/story/model/types';
 import { completeLayout } from '../lib/auto-layout';
 import { applyPositionChanges, applySizeChanges, type EditorLayout, type NodeSizes } from '../lib/editor-layout';
@@ -32,6 +38,7 @@ import {
 import { edgeTypes } from './edges/edge-types';
 import { IssuesPanel } from './issues-panel/IssuesPanel';
 import { NodePanel } from './node-panel/NodePanel';
+import { StoryDetailsPanel } from './story-details/StoryDetailsPanel';
 import { nodeTypes } from './nodes/node-types';
 import '@xyflow/react/dist/style.css';
 import styles from './StoryEditor.module.scss';
@@ -222,6 +229,10 @@ export function StoryEditor({ initialStory, initialLayout, onChange }: StoryEdit
 		setStatusMessage(message);
 	};
 
+	const handleDetailsSave = (patch: StoryDetailsPatch) => {
+		commit((current) => updateStoryDetails(current, patch), 'Story details edited');
+	};
+
 	const handleSave = (nodeId: string, patch: StoryNodePatch) => {
 		const node = getNode(story, nodeId);
 		const action = node ? `${typeLabels[node.type]} "${patch.title ?? node.title}" edited` : 'Node edited';
@@ -381,6 +392,11 @@ export function StoryEditor({ initialStory, initialLayout, onChange }: StoryEdit
 					<IssuesPanel
 						story={story}
 						onSelectNode={handleSelectNode}
+					/>
+					<StoryDetailsPanel
+						story={story}
+						formKey={restoreCount}
+						onSave={handleDetailsSave}
 					/>
 					<NodePanel
 						story={story}
