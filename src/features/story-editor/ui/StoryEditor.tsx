@@ -73,9 +73,10 @@ function isTextInput(target: EventTarget | null): boolean {
 
 type StoryEditorProps = {
 	initialStory: Story;
+	onStoryChange: (story: Story) => void;
 };
 
-export function StoryEditor({ initialStory }: StoryEditorProps) {
+export function StoryEditor({ initialStory, onStoryChange }: StoryEditorProps) {
 	const [history, setHistory] = useState<History<StoryRevision>>(() =>
 		createHistory({ story: initialStory, action: '' }),
 	);
@@ -87,6 +88,7 @@ export function StoryEditor({ initialStory }: StoryEditorProps) {
 	const [restoreCount, setRestoreCount] = useState(0);
 	const canvasRef = useRef<HTMLElement>(null);
 	const flowInstance = useRef<ReactFlowInstance<StoryFlowNode, Edge> | null>(null);
+	const lastReportedStory = useRef(initialStory);
 
 	const story = history.present.story;
 	const canUndo = history.past.length > 0;
@@ -158,6 +160,17 @@ export function StoryEditor({ initialStory }: StoryEditorProps) {
 
 		return () => document.removeEventListener('keydown', handleHistoryShortcut);
 	}, []);
+
+	const reportStoryChange = useEffectEvent((next: Story) => onStoryChange(next));
+
+	useEffect(() => {
+		if (story === lastReportedStory.current) {
+			return;
+		}
+
+		lastReportedStory.current = story;
+		reportStoryChange(story);
+	}, [story]);
 
 	const handleNodesChange = (changes: NodeChange<StoryFlowNode>[]) => {
 		setLayout((current) => applyPositionChanges(current, changes));
