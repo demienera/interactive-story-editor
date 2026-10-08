@@ -1,6 +1,6 @@
-import { notFound } from 'next/navigation';
 import { exampleStories, getExampleStory } from '@/entities/story/data/example-stories';
 import { StoryPlayer } from '@/features/story-player/ui/StoryPlayer';
+import { UserStoryPlayer } from './UserStoryPlayer';
 
 export function generateStaticParams() {
 	return exampleStories.map((story) => ({ storyId: story.id }));
@@ -11,7 +11,7 @@ export default async function PlayPage({ params }: PageProps<'/play/[storyId]'>)
 	const story = getExampleStory(storyId);
 
 	if (!story) {
-		notFound();
+		return <UserStoryPlayer storyId={storyId} />;
 	}
 
 	return (
