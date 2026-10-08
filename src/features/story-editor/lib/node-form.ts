@@ -6,7 +6,7 @@ const TITLE_MAX_LENGTH = 80;
 const TEXT_MAX_LENGTH = 2000;
 const CHOICE_LABEL_MAX_LENGTH = 120;
 
-const titleSchema = z
+export const titleSchema = z
 	.string()
 	.trim()
 	.min(1, 'Enter a title.')

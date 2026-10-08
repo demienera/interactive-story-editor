@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'vitest';
 import { getNextNodeByChoice } from './story-engine';
-import { addNode, connect, disconnect, removeNode, type StoryNodePatch, updateNode } from './story-operations';
+import {
+	addNode,
+	connect,
+	disconnect,
+	removeNode,
+	type StoryNodePatch,
+	updateNode,
+	updateStoryDetails,
+} from './story-operations';
 import type { Story } from './types';
 
 function createStory(): Story {
@@ -235,5 +243,44 @@ describe('disconnect', () => {
 
 	test('throws for an unknown edge', () => {
 		expect(() => disconnect(createStory(), 'unknown')).toThrow('Edge "unknown" does not exist.');
+	});
+});
+
+describe('updateStoryDetails', () => {
+	test('changes the title and the description', () => {
+		const story = createStory();
+		const updated = updateStoryDetails(story, { title: 'New title', description: 'New description' });
+
+		expect(updated.title).toBe('New title');
+		expect(updated.description).toBe('New description');
+		expect(updated.id).toBe(story.id);
+	});
+
+	test('keeps fields that are not in the patch', () => {
+		const story = createStory();
+
+		expect(updateStoryDetails(story, { description: 'Only this' }).title).toBe('Test Story');
+	});
+
+	test('keeps nodes and edges by reference', () => {
+		const story = createStory();
+		const updated = updateStoryDetails(story, { title: 'New title' });
+
+		expect(updated.nodes).toBe(story.nodes);
+		expect(updated.edges).toBe(story.edges);
+	});
+
+	test('returns the same story when nothing changes', () => {
+		const story = createStory();
+
+		expect(updateStoryDetails(story, { title: 'Test Story', description: '' })).toBe(story);
+	});
+
+	test('does not mutate the story', () => {
+		const story = createStory();
+
+		updateStoryDetails(story, { title: 'New title' });
+
+		expect(story.title).toBe('Test Story');
 	});
 });

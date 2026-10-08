@@ -5,6 +5,19 @@ type PatchOf<T> = T extends StoryNode ? Pick<T, 'type'> & Partial<Omit<T, 'id' |
 
 export type StoryNodePatch = PatchOf<StoryNode>;
 
+export type StoryDetailsPatch = Partial<Pick<Story, 'title' | 'description'>>;
+
+export function updateStoryDetails(story: Story, patch: StoryDetailsPatch): Story {
+	const title = patch.title ?? story.title;
+	const description = patch.description ?? story.description;
+
+	if (title === story.title && description === story.description) {
+		return story;
+	}
+
+	return { ...story, title, description };
+}
+
 export function addNode(story: Story, node: StoryNode): Story {
 	if (getNode(story, node.id)) {
 		throw new Error(`Node "${node.id}" already exists.`);
