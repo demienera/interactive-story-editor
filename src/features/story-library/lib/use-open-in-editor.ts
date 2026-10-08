@@ -8,7 +8,7 @@ export function useOpenInEditor() {
 	const [failed, setFailed] = useState(false);
 
 	const open = (story: Story) => {
-		if (!saveStory(story)) {
+		if (!saveStory(story, {})) {
 			setFailed(true);
 			return;
 		}

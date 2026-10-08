@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { deleteStory } from '@/entities/story/library/story-library';
 import type { Story } from '@/entities/story/model/types';
-import { useStories } from '../lib/use-story-library';
+import { useEntries } from '../lib/use-story-library';
 import { StoryCard } from './StoryCard';
 import styles from './StoryLibrary.module.scss';
 
 export function MyStories() {
-	const stories = useStories();
+	const entries = useEntries();
 	const [statusMessage, setStatusMessage] = useState('');
 	const headingRef = useRef<HTMLHeadingElement>(null);
 
@@ -47,12 +47,12 @@ export function MyStories() {
 			>
 				{statusMessage}
 			</p>
-			{stories?.length === 0 && (
+			{entries?.length === 0 && (
 				<p className={styles.message}>No stories yet. Start a new story or edit a copy of an example.</p>
 			)}
-			{stories && stories.length > 0 && (
+			{entries && entries.length > 0 && (
 				<ul className={styles.list}>
-					{stories.map((story) => (
+					{entries.map(({ story }) => (
 						<li key={story.id}>
 							<StoryCard story={story}>
 								<Link

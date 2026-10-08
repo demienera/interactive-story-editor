@@ -17,7 +17,7 @@ import {
 import { getNode } from '@/entities/story/model/story-engine';
 import { addNode, removeNode, type StoryNodePatch } from '@/entities/story/model/story-operations';
 import type { Story, StoryNodeType } from '@/entities/story/model/types';
-import { layoutByDepth } from '../lib/auto-layout';
+import { completeLayout } from '../lib/auto-layout';
 import { applyPositionChanges, applySizeChanges, type EditorLayout, type NodeSizes } from '../lib/editor-layout';
 import { createHistory, pushHistory, redo, undo, type History } from '../lib/history';
 import { createNode } from '../lib/node-factory';
@@ -73,14 +73,16 @@ function isTextInput(target: EventTarget | null): boolean {
 
 type StoryEditorProps = {
 	initialStory: Story;
-	onStoryChange: (story: Story) => void;
+	initialLayout: EditorLayout;
+	onChange: (story: Story, layout: EditorLayout) => void;
 };
 
-export function StoryEditor({ initialStory, onStoryChange }: StoryEditorProps) {
+export function StoryEditor({ initialStory, initialLayout, onChange }: StoryEditorProps) {
 	const [history, setHistory] = useState<History<StoryRevision>>(() =>
 		createHistory({ story: initialStory, action: '' }),
 	);
-	const [layout, setLayout] = useState<EditorLayout>(() => layoutByDepth(initialStory));
+	const [layout, setLayout] = useState<EditorLayout>(() => completeLayout(initialStory, initialLayout));
+	const [isDragging, setIsDragging] = useState(false);
 	const [nodeSizes, setNodeSizes] = useState<NodeSizes>({});
 	const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 	const [createdNodeId, setCreatedNodeId] = useState<string | null>(null);
@@ -88,7 +90,7 @@ export function StoryEditor({ initialStory, onStoryChange }: StoryEditorProps) {
 	const [restoreCount, setRestoreCount] = useState(0);
 	const canvasRef = useRef<HTMLElement>(null);
 	const flowInstance = useRef<ReactFlowInstance<StoryFlowNode, Edge> | null>(null);
-	const lastReportedStory = useRef(initialStory);
+	const lastReported = useRef({ story: initialStory, layout });
 
 	const story = history.present.story;
 	const canUndo = history.past.length > 0;
@@ -161,16 +163,16 @@ export function StoryEditor({ initialStory, onStoryChange }: StoryEditorProps) {
 		return () => document.removeEventListener('keydown', handleHistoryShortcut);
 	}, []);
 
-	const reportStoryChange = useEffectEvent((next: Story) => onStoryChange(next));
+	const reportChange = useEffectEvent((nextStory: Story, nextLayout: EditorLayout) => onChange(nextStory, nextLayout));
 
 	useEffect(() => {
-		if (story === lastReportedStory.current) {
+		if (isDragging || (story === lastReported.current.story && layout === lastReported.current.layout)) {
 			return;
 		}
 
-		lastReportedStory.current = story;
-		reportStoryChange(story);
-	}, [story]);
+		lastReported.current = { story, layout };
+		reportChange(story, layout);
+	}, [story, layout, isDragging]);
 
 	const handleNodesChange = (changes: NodeChange<StoryFlowNode>[]) => {
 		setLayout((current) => applyPositionChanges(current, changes));
@@ -337,6 +339,8 @@ export function StoryEditor({ initialStory, onStoryChange }: StoryEditorProps) {
 						deleteKeyCode={DELETE_KEYS}
 						onBeforeDelete={isFocusInCanvas}
 						onDelete={handleKeyboardDelete}
+						onNodeDragStart={() => setIsDragging(true)}
+						onNodeDragStop={() => setIsDragging(false)}
 						ariaLabelConfig={ariaLabelConfig}
 						fitView
 					>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { saveStory } from '@/entities/story/library/story-library';
+import { saveStory, type StoryLayout } from '@/entities/story/library/story-library';
 import type { Story } from '@/entities/story/model/types';
 import { StoryEditor } from '@/features/story-editor/ui/StoryEditor';
 import { useStory } from '@/features/story-library/lib/use-story-library';
@@ -20,8 +20,8 @@ export function EditorPage({ storyId }: EditorPageProps) {
 		return <StoryLookupMessage status={lookup.status} />;
 	}
 
-	const handleStoryChange = (story: Story) => {
-		setSaveFailed(!saveStory(story));
+	const handleChange = (story: Story, layout: StoryLayout) => {
+		setSaveFailed(!saveStory(story, layout));
 	};
 
 	return (
@@ -29,7 +29,8 @@ export function EditorPage({ storyId }: EditorPageProps) {
 			<StoryEditor
 				key={storyId}
 				initialStory={lookup.story}
-				onStoryChange={handleStoryChange}
+				initialLayout={lookup.layout}
+				onChange={handleChange}
 			/>
 			{saveFailed && (
 				<p
