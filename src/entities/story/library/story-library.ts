@@ -1,11 +1,18 @@
 import type { Story } from '../model/types';
 
+export type StoryLayout = Record<string, { x: number; y: number }>;
+
+export type LibraryEntry = {
+	story: Story;
+	layout: StoryLayout;
+};
+
 const STORAGE_KEY = 'interactive-story-editor:stories';
-const LIBRARY_VERSION = 1;
+const LIBRARY_VERSION = 2;
 
 type StoredLibrary = {
 	version: typeof LIBRARY_VERSION;
-	stories: Story[];
+	entries: LibraryEntry[];
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -23,7 +30,43 @@ function isStoryLike(value: unknown): value is Story {
 	);
 }
 
-export function parseLibrary(raw: string | null): Story[] {
+function isPosition(value: unknown): value is { x: number; y: number } {
+	return isRecord(value) && Number.isFinite(value.x) && Number.isFinite(value.y);
+}
+
+function parseLayout(value: unknown): StoryLayout {
+	if (!isRecord(value) || Array.isArray(value)) {
+		return {};
+	}
+
+	const layout: StoryLayout = {};
+
+	for (const [nodeId, position] of Object.entries(value)) {
+		if (!isPosition(position)) {
+			return {};
+		}
+
+		layout[nodeId] = { x: position.x, y: position.y };
+	}
+
+	return layout;
+}
+
+function parseEntries(data: Record<string, unknown>): LibraryEntry[] {
+	if (data.version === 1 && Array.isArray(data.stories)) {
+		return data.stories.filter(isStoryLike).map((story) => ({ story, layout: {} }));
+	}
+
+	if (data.version === LIBRARY_VERSION && Array.isArray(data.entries)) {
+		return data.entries.flatMap((entry: unknown) =>
+			isRecord(entry) && isStoryLike(entry.story) ? [{ story: entry.story, layout: parseLayout(entry.layout) }] : [],
+		);
+	}
+
+	return [];
+}
+
+export function parseLibrary(raw: string | null): LibraryEntry[] {
 	if (raw === null) {
 		return [];
 	}
@@ -36,31 +79,39 @@ export function parseLibrary(raw: string | null): Story[] {
 		return [];
 	}
 
-	if (!isRecord(data) || data.version !== LIBRARY_VERSION || !Array.isArray(data.stories)) {
-		return [];
-	}
-
-	return data.stories.filter(isStoryLike);
+	return isRecord(data) ? parseEntries(data) : [];
 }
 
-export function serializeLibrary(stories: Story[]): string {
-	const library: StoredLibrary = { version: LIBRARY_VERSION, stories };
+export function serializeLibrary(entries: LibraryEntry[]): string {
+	const library: StoredLibrary = { version: LIBRARY_VERSION, entries };
 
 	return JSON.stringify(library);
 }
 
-export function upsertStory(stories: Story[], story: Story): Story[] {
-	return [story, ...stories.filter((current) => current.id !== story.id)];
+export function pruneLayout(story: Story, layout: StoryLayout): StoryLayout {
+	const pruned: StoryLayout = {};
+
+	for (const node of story.nodes) {
+		if (layout[node.id]) {
+			pruned[node.id] = layout[node.id];
+		}
+	}
+
+	return pruned;
 }
 
-export function removeStory(stories: Story[], id: string): Story[] {
-	return stories.filter((story) => story.id !== id);
+export function upsertEntry(entries: LibraryEntry[], entry: LibraryEntry): LibraryEntry[] {
+	return [entry, ...entries.filter((current) => current.story.id !== entry.story.id)];
+}
+
+export function removeEntry(entries: LibraryEntry[], id: string): LibraryEntry[] {
+	return entries.filter((entry) => entry.story.id !== id);
 }
 
 const listeners = new Set<() => void>();
 
 let cachedRaw: string | null = null;
-let cachedStories: Story[] = [];
+let cachedEntries: LibraryEntry[] = [];
 
 function readRaw(): string | null {
 	try {
@@ -70,20 +121,20 @@ function readRaw(): string | null {
 	}
 }
 
-export function getStories(): Story[] {
+export function getEntries(): LibraryEntry[] {
 	const raw = readRaw();
 
 	if (raw !== cachedRaw) {
 		cachedRaw = raw;
-		cachedStories = parseLibrary(raw);
+		cachedEntries = parseLibrary(raw);
 	}
 
-	return cachedStories;
+	return cachedEntries;
 }
 
-function writeStories(stories: Story[]): boolean {
+function writeEntries(entries: LibraryEntry[]): boolean {
 	try {
-		window.localStorage.setItem(STORAGE_KEY, serializeLibrary(stories));
+		window.localStorage.setItem(STORAGE_KEY, serializeLibrary(entries));
 	} catch {
 		return false;
 	}
@@ -93,12 +144,12 @@ function writeStories(stories: Story[]): boolean {
 	return true;
 }
 
-export function saveStory(story: Story): boolean {
-	return writeStories(upsertStory(getStories(), story));
+export function saveStory(story: Story, layout: StoryLayout): boolean {
+	return writeEntries(upsertEntry(getEntries(), { story, layout: pruneLayout(story, layout) }));
 }
 
 export function deleteStory(id: string): boolean {
-	return writeStories(removeStory(getStories(), id));
+	return writeEntries(removeEntry(getEntries(), id));
 }
 
 function handleStorage(event: StorageEvent) {

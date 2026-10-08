@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { whisperingForest } from '@/entities/story/data/examples/whispering-forest';
 import type { Story } from '@/entities/story/model/types';
-import { layoutByDepth } from './auto-layout';
+import { completeLayout, layoutByDepth } from './auto-layout';
 
 describe('layoutByDepth', () => {
 	test('creates a position for every node', () => {
@@ -35,5 +35,19 @@ describe('layoutByDepth', () => {
 		const reachableYs = whisperingForest.nodes.map((node) => layout[node.id]?.y ?? 0);
 
 		expect(layout.orphan?.y).toBeGreaterThan(Math.max(...reachableYs));
+	});
+});
+
+describe('completeLayout', () => {
+	test('uses the automatic layout when nothing is saved', () => {
+		expect(completeLayout(whisperingForest, {})).toEqual(layoutByDepth(whisperingForest));
+	});
+
+	test('keeps saved positions and fills in the missing ones', () => {
+		const layout = completeLayout(whisperingForest, { forest: { x: 500, y: -40 } });
+
+		expect(layout.forest).toEqual({ x: 500, y: -40 });
+		expect(layout.start).toEqual(layoutByDepth(whisperingForest).start);
+		expect(Object.keys(layout)).toHaveLength(whisperingForest.nodes.length);
 	});
 });

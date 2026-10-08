@@ -46,3 +46,7 @@ export function layoutByDepth(story: Story): EditorLayout {
 
 	return layout;
 }
+
+export function completeLayout(story: Story, layout: EditorLayout): EditorLayout {
+	return { ...layoutByDepth(story), ...layout };
+}
