@@ -15,7 +15,7 @@ export function NewStoryButton() {
 				className={clsx(styles.action, styles.primaryAction)}
 				onClick={() => open(createEmptyStory(crypto.randomUUID(), crypto.randomUUID()))}
 			>
-				New story
+				Create story
 			</button>
 			{failed && (
 				<p
