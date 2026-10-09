@@ -117,6 +117,16 @@
 	font-size: 14px;
 }
 
+.preview {
+	width: 100%;
+	max-width: 192px;
+	height: auto;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-sm);
+}
+
 .choiceRow {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) auto;

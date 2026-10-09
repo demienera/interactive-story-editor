@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRef } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import type { StoryNodePatch } from '@/entities/story/model/story-operations';
 import type { SceneNode } from '@/entities/story/model/types';
 import { sceneFormSchema, toSceneFormValues, toScenePatch, type SceneFormValues } from '../../lib/node-form';
+import { BackgroundField } from './BackgroundField';
 import { FormField } from './FormField';
 import { SaveActions } from './SaveActions';
 import styles from './NodePanel.module.scss';
@@ -26,6 +27,7 @@ export function SceneNodeForm({ node, onSave, autoFocusTitle }: SceneNodeFormPro
 		defaultValues: toSceneFormValues(node),
 	});
 	const { fields, append, remove } = useFieldArray({ control, name: 'choices' });
+	const background = useWatch({ control, name: 'background' });
 	const addChoiceRef = useRef<HTMLButtonElement>(null);
 
 	const onSubmit = (values: SceneFormValues) => {
@@ -55,6 +57,10 @@ export function SceneNodeForm({ node, onSave, autoFocusTitle }: SceneNodeFormPro
 				registration={register('text')}
 				error={errors.text?.message}
 				multiline
+			/>
+			<BackgroundField
+				registration={register('background')}
+				value={background}
 			/>
 
 			<fieldset className={styles.fieldset}>
