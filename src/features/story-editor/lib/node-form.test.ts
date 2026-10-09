@@ -31,9 +31,10 @@ describe('node form schemas', () => {
 	});
 
 	test('trim values', () => {
-		expect(endingFormSchema.parse({ title: '  The End  ', text: ' Bye. ' })).toEqual({
+		expect(endingFormSchema.parse({ title: '  The End  ', text: ' Bye. ', background: '' })).toEqual({
 			title: 'The End',
 			text: 'Bye.',
+			background: '',
 		});
 	});
 
@@ -47,6 +48,7 @@ describe('node form schemas', () => {
 		const result = sceneFormSchema.safeParse({
 			title: 'Gate',
 			text: 'Text',
+			background: '',
 			choices: [
 				{ choiceId: 'left', label: 'Left' },
 				{ choiceId: 'right', label: '' },
@@ -62,6 +64,7 @@ describe('scene form mapping', () => {
 		expect(toSceneFormValues(scene)).toEqual({
 			title: 'The Gate',
 			text: 'Two paths lead away from the gate.',
+			background: '',
 			choices: [
 				{ choiceId: 'go-left', label: 'Go left' },
 				{ choiceId: 'go-right', label: 'Go right' },
@@ -73,6 +76,7 @@ describe('scene form mapping', () => {
 		const patch = toScenePatch({
 			title: 'The Old Gate',
 			text: 'Moss covers the stones.',
+			background: '',
 			choices: [
 				{ choiceId: 'go-left', label: 'Take the left path' },
 				{ choiceId: 'go-right', label: 'Go right' },
@@ -94,6 +98,7 @@ describe('scene form mapping', () => {
 		const patch = toScenePatch({
 			title: 'The Gate',
 			text: 'Two paths lead away from the gate.',
+			background: '',
 			choices: [
 				{ choiceId: 'go-right', label: 'Go right' },
 				{ choiceId: 'new-choice', label: 'Climb the wall' },
@@ -126,9 +131,28 @@ describe('scene form mapping', () => {
 	});
 });
 
+describe('background mapping', () => {
+	test('a node without a background gets an empty value, and an empty value removes it', () => {
+		expect(toSceneFormValues(scene).background).toBe('');
+		expect(toEndingPatch({ title: 'End', text: 'Bye.', background: '' })).toEqual({ type: 'ending', title: 'End', text: 'Bye.' });
+	});
+
+	test('a selected background goes into the patch and back', () => {
+		const patch = toScenePatch({ ...toSceneFormValues(scene), background: 'forest-shrine' });
+
+		expect(patch).toMatchObject({ type: 'scene', background: 'forest-shrine' });
+		expect(toSceneFormValues({ ...scene, background: 'forest-shrine' }).background).toBe('forest-shrine');
+	});
+});
+
 describe('start and ending patches', () => {
 	test('carry the node type', () => {
-		expect(toStartPatch({ title: 'Begin' })).toEqual({ type: 'start', title: 'Begin' });
-		expect(toEndingPatch({ title: 'End', text: 'Bye.' })).toEqual({ type: 'ending', title: 'End', text: 'Bye.' });
+		expect(toStartPatch({ title: 'Begin', background: '' })).toEqual({ type: 'start', title: 'Begin' });
+		expect(toStartPatch({ title: 'Begin', background: 'crossroads' })).toEqual({
+			type: 'start',
+			title: 'Begin',
+			background: 'crossroads',
+		});
+		expect(toEndingPatch({ title: 'End', text: 'Bye.', background: '' })).toEqual({ type: 'ending', title: 'End', text: 'Bye.' });
 	});
 });

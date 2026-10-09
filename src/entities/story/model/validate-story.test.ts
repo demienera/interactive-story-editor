@@ -201,4 +201,49 @@ describe('validateStory', () => {
 			]);
 		});
 	});
+
+	describe('backgrounds', () => {
+		const known = new Set(['forest']);
+
+		function withBackgrounds(gate: string | undefined, leftEnd: string | undefined): Story {
+			const story = createStory();
+
+			return {
+				...story,
+				nodes: story.nodes.map((node) => {
+					if (node.id === 'gate' && node.type === 'scene') {
+						return { ...node, background: gate };
+					}
+
+					return node.id === 'left-end' && node.type === 'ending' ? { ...node, background: leftEnd } : node;
+				}),
+			};
+		}
+
+		test('accepts known backgrounds and nodes without a background', () => {
+			expect(validateStory(withBackgrounds('forest', undefined), known)).toEqual([]);
+		});
+
+		test('reports a background that is not in the known list', () => {
+			expect(validateStory(withBackgrounds('forest', 'old-cave'), known)).toEqual([
+				{ code: 'unknown-background', severity: 'warning', nodeId: 'left-end', background: 'old-cave' },
+			]);
+		});
+
+		test('checks the start node too', () => {
+			const story = createStory();
+			const withStartBackground: Story = {
+				...story,
+				nodes: story.nodes.map((node) => (node.type === 'start' ? { ...node, background: 'old-cave' } : node)),
+			};
+
+			expect(validateStory(withStartBackground, known)).toEqual([
+				{ code: 'unknown-background', severity: 'warning', nodeId: 'start', background: 'old-cave' },
+			]);
+		});
+
+		test('skips the check when known backgrounds are not passed', () => {
+			expect(validateStory(withBackgrounds('old-cave', 'old-cave'))).toEqual([]);
+		});
+	});
 });

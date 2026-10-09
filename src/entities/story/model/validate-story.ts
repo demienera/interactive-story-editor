@@ -8,11 +8,12 @@ export type StoryIssue =
 	| { code: 'missing-node'; severity: 'error'; edgeId: string; nodeId: string }
 	| { code: 'unknown-choice'; severity: 'error'; edgeId: string; choiceId: string }
 	| { code: 'ignored-edge'; severity: 'warning'; edgeId: string }
-	| { code: 'unreachable-node'; severity: 'warning'; nodeId: string };
+	| { code: 'unreachable-node'; severity: 'warning'; nodeId: string }
+	| { code: 'unknown-background'; severity: 'warning'; nodeId: string; background: string };
 
 export type StoryIssueSeverity = StoryIssue['severity'];
 
-export function validateStory(story: Story): StoryIssue[] {
+export function validateStory(story: Story, knownBackgrounds?: ReadonlySet<string>): StoryIssue[] {
 	const nodesById = new Map(story.nodes.map((node) => [node.id, node]));
 
 	return [
@@ -20,6 +21,7 @@ export function validateStory(story: Story): StoryIssue[] {
 		...story.nodes.flatMap((node) => checkExits(story, node)),
 		...checkEdges(story, nodesById),
 		...checkReachability(story, nodesById),
+		...(knownBackgrounds ? checkBackgrounds(story, knownBackgrounds) : []),
 	];
 }
 
@@ -131,4 +133,12 @@ function checkReachability(story: Story, nodesById: Map<string, StoryNode>): Sto
 	return story.nodes
 		.filter((node) => !reached.has(node.id))
 		.map((node): StoryIssue => ({ code: 'unreachable-node', severity: 'warning', nodeId: node.id }));
+}
+
+function checkBackgrounds(story: Story, knownBackgrounds: ReadonlySet<string>): StoryIssue[] {
+	return story.nodes.flatMap((node): StoryIssue[] =>
+		node.background !== undefined && !knownBackgrounds.has(node.background)
+			? [{ code: 'unknown-background', severity: 'warning', nodeId: node.id, background: node.background }]
+			: [],
+	);
 }

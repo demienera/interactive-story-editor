@@ -60,6 +60,10 @@ describe('getIssueMessage', () => {
 			{ code: 'unreachable-node', severity: 'warning', nodeId: 'left-end' },
 			'"Left End" cannot be reached from the start.',
 		],
+		[
+			{ code: 'unknown-background', severity: 'warning', nodeId: 'left-end', background: 'old-cave' },
+			'"Left End" uses a background that no longer exists.',
+		],
 	])('describes %o', (issue, message) => {
 		expect(getIssueMessage(story, issue)).toBe(message);
 	});

@@ -1,10 +1,11 @@
 import { describe, expect, test } from 'vitest';
 import { validateStory } from '../model/validate-story';
+import { backgroundIds } from './backgrounds';
 import { exampleStories, getExampleStory } from './example-stories';
 
 describe('exampleStories', () => {
 	test.each(exampleStories.map((story) => [story.title, story] as const))('"%s" has no issues', (_title, story) => {
-		expect(validateStory(story)).toEqual([]);
+		expect(validateStory(story, backgroundIds)).toEqual([]);
 	});
 
 	test('every example has a unique id', () => {

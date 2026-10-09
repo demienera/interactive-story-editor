@@ -24,13 +24,16 @@ const choiceLabelSchema = z
 	.min(1, 'Enter the choice label.')
 	.max(CHOICE_LABEL_MAX_LENGTH, `Keep the label under ${CHOICE_LABEL_MAX_LENGTH} characters.`);
 
-export const startFormSchema = z.object({ title: titleSchema });
+const backgroundSchema = z.string();
 
-export const endingFormSchema = z.object({ title: titleSchema, text: textSchema });
+export const startFormSchema = z.object({ title: titleSchema, background: backgroundSchema });
+
+export const endingFormSchema = z.object({ title: titleSchema, text: textSchema, background: backgroundSchema });
 
 export const sceneFormSchema = z.object({
 	title: titleSchema,
 	text: textSchema,
+	background: backgroundSchema,
 	choices: z.array(z.object({ choiceId: z.string(), label: choiceLabelSchema })),
 });
 
@@ -39,25 +42,26 @@ export type EndingFormValues = z.infer<typeof endingFormSchema>;
 export type SceneFormValues = z.infer<typeof sceneFormSchema>;
 
 export function toStartFormValues(node: StartNode): StartFormValues {
-	return { title: node.title };
+	return { title: node.title, background: node.background ?? '' };
 }
 
 export function toStartPatch(values: StartFormValues): StoryNodePatch {
-	return { type: 'start', title: values.title };
+	return { type: 'start', title: values.title, background: values.background || undefined };
 }
 
 export function toEndingFormValues(node: EndingNode): EndingFormValues {
-	return { title: node.title, text: node.text };
+	return { title: node.title, text: node.text, background: node.background ?? '' };
 }
 
 export function toEndingPatch(values: EndingFormValues): StoryNodePatch {
-	return { type: 'ending', title: values.title, text: values.text };
+	return { type: 'ending', title: values.title, text: values.text, background: values.background || undefined };
 }
 
 export function toSceneFormValues(node: SceneNode): SceneFormValues {
 	return {
 		title: node.title,
 		text: node.text,
+		background: node.background ?? '',
 		choices: node.choices.map((choice) => ({ choiceId: choice.id, label: choice.label })),
 	};
 }
@@ -67,6 +71,7 @@ export function toScenePatch(values: SceneFormValues): StoryNodePatch {
 		type: 'scene',
 		title: values.title,
 		text: values.text,
+		background: values.background || undefined,
 		choices: values.choices.map((choice) => ({ id: choice.choiceId, label: choice.label })),
 	};
 }

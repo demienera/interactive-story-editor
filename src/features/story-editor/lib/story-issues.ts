@@ -43,6 +43,8 @@ export function getIssueMessage(story: Story, issue: StoryIssue): string {
 			return `${describeEdgeSource(story, issue.edgeId)} is never used.`;
 		case 'unreachable-node':
 			return `"${getTitle(story, issue.nodeId)}" cannot be reached from the start.`;
+		case 'unknown-background':
+			return `"${getTitle(story, issue.nodeId)}" uses a background that no longer exists.`;
 	}
 }
 
@@ -55,6 +57,7 @@ export function getIssueNodeId(story: Story, issue: StoryIssue): string | undefi
 		case 'dead-end':
 		case 'missing-choice-edge':
 		case 'unreachable-node':
+		case 'unknown-background':
 			return issue.nodeId;
 		case 'missing-node':
 		case 'unknown-choice':
