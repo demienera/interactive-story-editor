@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useId, useMemo } from 'react';
+import { backgroundIds } from '@/entities/story/data/backgrounds';
 import type { Story } from '@/entities/story/model/types';
 import { validateStory, type StoryIssueSeverity } from '@/entities/story/model/validate-story';
 import { getIssueMessage, getIssueNodeId, getIssueSummary, sortIssues } from '../../lib/story-issues';
@@ -17,7 +18,7 @@ const severityLabels = {
 
 export function IssuesPanel({ story, onSelectNode }: IssuesPanelProps) {
 	const headingId = useId();
-	const issues = useMemo(() => sortIssues(validateStory(story)), [story]);
+	const issues = useMemo(() => sortIssues(validateStory(story, backgroundIds)), [story]);
 
 	return (
 		<section
