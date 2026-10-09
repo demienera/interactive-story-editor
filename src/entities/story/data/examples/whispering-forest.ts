@@ -9,6 +9,7 @@ export const whisperingForest: Story = {
 			id: 'start',
 			type: 'start',
 			title: 'Start',
+			background: 'forest-clearing',
 		},
 		{
 			id: 'forest',
@@ -25,6 +26,7 @@ export const whisperingForest: Story = {
 					label: 'Look for shelter',
 				},
 			],
+			background: 'forest-clearing',
 		},
 		{
 			id: 'whisper',
@@ -32,6 +34,7 @@ export const whisperingForest: Story = {
 			title: 'The Whisper',
 			text: 'You follow the sound deeper into the forest and discover a small stone shrine covered in glowing symbols.',
 			choices: [],
+			background: 'forest-shrine',
 		},
 		{
 			id: 'shelter',
@@ -39,6 +42,7 @@ export const whisperingForest: Story = {
 			title: 'The Shelter',
 			text: 'You find an abandoned cabin hidden between the trees. Its door is slightly open.',
 			choices: [],
+			background: 'forest-cabin',
 		},
 		{
 			id: 'mysterious-shrine',
@@ -51,6 +55,7 @@ export const whisperingForest: Story = {
 			type: 'ending',
 			title: 'The Old Cabin',
 			text: 'You step inside the cabin and discover a warm fire still burning. Someone — or something — has been expecting you.',
+			background: 'cabin-interior',
 		},
 	],
 	edges: [

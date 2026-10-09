@@ -2,6 +2,7 @@ export type StartNode = {
 	id: string;
 	type: 'start';
 	title: string;
+	background?: string;
 };
 
 export type Choice = {
@@ -15,6 +16,7 @@ export type SceneNode = {
 	title: string;
 	text: string;
 	choices: Choice[];
+	background?: string;
 };
 
 export type EndingNode = {
@@ -22,6 +24,7 @@ export type EndingNode = {
 	type: 'ending';
 	title: string;
 	text: string;
+	background?: string;
 };
 
 export type StoryNode = StartNode | SceneNode | EndingNode;

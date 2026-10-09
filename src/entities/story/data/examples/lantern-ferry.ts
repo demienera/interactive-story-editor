@@ -9,6 +9,7 @@ export const lanternFerry: Story = {
 			id: 'start',
 			type: 'start',
 			title: 'Start',
+			background: 'crossroads',
 		},
 		{
 			id: 'crossroads',
@@ -19,6 +20,7 @@ export const lanternFerry: Story = {
 				{ id: 'take-reeds', label: 'Take the path through the reeds' },
 				{ id: 'take-stairs', label: 'Climb down the old stone stairs' },
 			],
+			background: 'crossroads',
 		},
 		{
 			id: 'reeds',
@@ -26,6 +28,7 @@ export const lanternFerry: Story = {
 			title: 'The Reeds',
 			text: 'The reeds are taller than you. Fireflies drift between them and lead you, one by one, toward a single lantern on the shore.',
 			choices: [],
+			background: 'river-reeds',
 		},
 		{
 			id: 'stairs',
@@ -33,6 +36,7 @@ export const lanternFerry: Story = {
 			title: 'The Stone Stairs',
 			text: 'The stairs are slick with moss. Someone has carved names into every step, and the last one is still fresh.',
 			choices: [],
+			background: 'stone-stairs',
 		},
 		{
 			id: 'ferry',
@@ -43,6 +47,7 @@ export const lanternFerry: Story = {
 				{ id: 'pay-coin', label: 'Pay with the silver coin' },
 				{ id: 'offer-name', label: 'Offer your name instead' },
 			],
+			background: 'ferry-pier',
 		},
 		{
 			id: 'crossing',
@@ -50,18 +55,21 @@ export const lanternFerry: Story = {
 			title: 'The Crossing',
 			text: 'The coin sinks without a sound. Halfway across, the lanterns on the far shore light up one after another, as if someone has been waiting.',
 			choices: [],
+			background: 'river-crossing',
 		},
 		{
 			id: 'far-shore',
 			type: 'ending',
 			title: 'The Far Shore',
 			text: 'An old woman meets you on the pier and takes the letter from your hand. "You came in time," she says, and blows out the last lantern.',
+			background: 'far-shore',
 		},
 		{
 			id: 'nameless',
 			type: 'ending',
 			title: 'The Nameless Traveller',
 			text: 'The ferryman smiles and writes your name on a fresh step. You cross the river lightly, and you no longer remember why you came.',
+			background: 'river-crossing',
 		},
 	],
 	edges: [

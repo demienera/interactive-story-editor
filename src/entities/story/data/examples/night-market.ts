@@ -9,6 +9,7 @@ export const nightMarket: Story = {
 			id: 'start',
 			type: 'start',
 			title: 'Start',
+			background: 'lantern-gate',
 		},
 		{
 			id: 'gate',
@@ -16,6 +17,7 @@ export const nightMarket: Story = {
 			title: 'The Lantern Gate',
 			text: 'At midnight the paper lanterns at the edge of the forest light up by themselves. Between two old oaks, a gate you have never seen before swings open.',
 			choices: [],
+			background: 'lantern-gate',
 		},
 		{
 			id: 'square',
@@ -27,6 +29,7 @@ export const nightMarket: Story = {
 				{ id: 'follow-tea', label: 'Follow the smell of spiced tea' },
 				{ id: 'find-fortune', label: 'Look for the fortune teller' },
 			],
+			background: 'market-square',
 		},
 		{
 			id: 'masks',
@@ -37,12 +40,14 @@ export const nightMarket: Story = {
 				{ id: 'try-fox', label: 'Try on the fox mask' },
 				{ id: 'masks-back', label: 'Return to the square' },
 			],
+			background: 'mask-shop',
 		},
 		{
 			id: 'fox',
 			type: 'ending',
 			title: 'The Fox',
 			text: 'The mask fits perfectly. You run through the forest on four quick paws, and you never once think about going home.',
+			background: 'moonlit-forest-run',
 		},
 		{
 			id: 'tea',
@@ -50,6 +55,7 @@ export const nightMarket: Story = {
 			title: 'The Tea Stall',
 			text: 'The tea tastes of cinnamon and rain. The cup refills itself whenever you look away, and the stall keeper only laughs when you ask what you owe.',
 			choices: [],
+			background: 'tea-stall',
 		},
 		{
 			id: 'stranger',
@@ -77,18 +83,21 @@ export const nightMarket: Story = {
 				{ id: 'knock-door', label: 'Knock on the blue door' },
 				{ id: 'walk-fog', label: 'Keep walking into the fog' },
 			],
+			background: 'silver-alley',
 		},
 		{
 			id: 'keeper',
 			type: 'ending',
 			title: 'The Keeper of the Market',
 			text: 'Behind the door is a room full of keys. The stranger hands you one. "Someone has to open the gate at midnight," she says. "Now it is you."',
+			background: 'key-room',
 		},
 		{
 			id: 'dawn',
 			type: 'ending',
 			title: 'Dawn',
 			text: 'The fog thins, and you are standing in an ordinary clearing at sunrise. In your pocket you find the map, now blank, and a cup still warm.',
+			background: 'dawn-clearing',
 		},
 		{
 			id: 'fortune',
@@ -99,6 +108,7 @@ export const nightMarket: Story = {
 				{ id: 'open-jar', label: 'Open the jar' },
 				{ id: 'fortune-back', label: 'Return to the square' },
 			],
+			background: 'fortune-teller',
 		},
 		{
 			id: 'starlight',
@@ -112,6 +122,7 @@ export const nightMarket: Story = {
 			type: 'ending',
 			title: 'Among the Stars',
 			text: 'When the light fades, the market is gone. Above the forest there is one new star, and somehow you know it is watching over you.',
+			background: 'night-sky',
 		},
 	],
 	edges: [
