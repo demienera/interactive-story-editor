@@ -11,23 +11,57 @@
 		position: absolute;
 		inset: 0;
 		z-index: -1;
-		background: linear-gradient(to bottom, transparent 60%, var(--color-canvas)), var(--color-hero-overlay-strong);
+		background: linear-gradient(
+			to bottom,
+			transparent 45%,
+			var(--color-hero-overlay-strong) 75%,
+			var(--color-canvas) 100%
+		);
 	}
 }
 
 .background {
 	z-index: -2;
 	object-fit: cover;
-	object-position: 66% 50%;
+	object-position: 50% 50%;
+}
+
+.entering {
+	opacity: 0;
+
+	&[data-loaded] {
+		opacity: 1;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		transition: opacity 700ms ease;
+	}
 }
 
 .header {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
 	align-items: center;
-	justify-content: space-between;
 	gap: 12px;
 	padding: 16px clamp(16px, 4vw, 32px);
+}
+
+.storyTitle {
+	justify-self: center;
+	max-width: 100%;
+	margin: 0;
+	padding: 6px 14px;
+	border-radius: var(--radius-pill);
+	background: var(--color-surface);
+	overflow: hidden;
+	font-size: 12px;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-align: center;
+	text-overflow: ellipsis;
+	text-transform: uppercase;
+	white-space: nowrap;
+	color: var(--color-text-muted);
 }
 
 .control {
@@ -51,50 +85,128 @@
 
 .player {
 	display: grid;
-	place-items: center;
-	padding: 8px 16px 48px;
+	align-items: end;
+	justify-items: center;
+	padding: 8px 16px clamp(16px, 4vh, 40px);
 }
 
-.card {
-	width: min(100%, 640px);
-	padding: clamp(24px, 5vw, 40px);
+.window {
+	position: relative;
+	width: min(100%, 1100px);
+	margin-top: 32px;
+	padding: 44px clamp(20px, 4vw, 48px) 20px;
 	display: grid;
-	gap: 20px;
+	gap: 16px;
 	border: 1px solid var(--color-border);
 	border-radius: var(--radius-md);
-	background: radial-gradient(120% 70% at 50% 0%, var(--color-glow), transparent 70%), var(--color-surface);
-}
-
-.storyTitle {
-	margin: 0;
-	font-size: 12px;
-	font-weight: 500;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-	color: var(--color-text-muted);
+	background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+	backdrop-filter: blur(8px);
 }
 
 .title {
+	position: absolute;
+	top: 0;
+	left: clamp(16px, 4vw, 40px);
+	max-width: calc(100% - 2 * clamp(16px, 4vw, 40px));
 	margin: 0;
+	padding: 6px 22px;
+	transform: translateY(-50%);
+	border: 1px solid var(--color-accent);
+	border-radius: var(--radius-pill);
+	background: radial-gradient(120% 120% at 50% 0%, var(--color-glow), transparent 70%), var(--color-surface);
 	font-family: var(--font-story);
-	font-size: clamp(28px, 6vw, 36px);
+	font-size: clamp(20px, 4vw, 26px);
 	font-style: italic;
 	font-weight: 400;
-	line-height: 1.15;
-	text-wrap: balance;
+	line-height: 1.2;
 }
 
 .text {
 	margin: 0;
 	font-family: var(--font-story);
-	font-size: 18px;
+	font-size: 19px;
 	line-height: 1.7;
 }
 
+.untyped {
+	color: transparent;
+}
+
 .actions {
-	display: grid;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
 	gap: 12px;
-	margin-top: 4px;
+
+	@media (prefers-reduced-motion: no-preference) {
+		transition: opacity 250ms ease;
+	}
+
+	[data-typing] & {
+		opacity: 0;
+		pointer-events: none;
+	}
+}
+
+.choices {
+	display: grid;
+	justify-content: stretch;
+	gap: 10px;
+}
+
+.next {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 44px;
+	padding: 8px 16px;
+	border: 1px solid transparent;
+	border-radius: var(--radius-pill);
+	background: transparent;
+	color: var(--color-text);
+	font: 500 15px/1 var(--font-ui);
+	cursor: pointer;
+
+	&:hover {
+		border-color: var(--color-accent);
+		background: var(--color-glow);
+	}
+}
+
+.indicator {
+	font-size: 11px;
+	color: var(--color-accent);
+
+	@media (prefers-reduced-motion: no-preference) {
+		animation: bob 1.2s ease-in-out infinite;
+	}
+}
+
+@keyframes bob {
+	50% {
+		transform: translateY(3px);
+	}
+}
+
+.choice {
+	min-height: 48px;
+	padding: 12px 20px;
+	border: 1px solid var(--color-border);
+	border-left: 3px solid var(--color-accent);
+	border-radius: var(--radius-sm);
+	background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+	color: var(--color-text);
+	font: 500 16px/1.4 var(--font-ui);
+	text-align: left;
+	cursor: pointer;
+
+	&:hover {
+		background: var(--color-glow);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		transition: background-color 120ms ease;
+	}
 }
 
 .button {
@@ -107,7 +219,6 @@
 	background: transparent;
 	color: var(--color-text);
 	font: 500 16px/1.3 var(--font-ui);
-	text-align: left;
 	text-decoration: none;
 	cursor: pointer;
 
@@ -123,6 +234,12 @@
 .ending {
 	margin: 0;
 	font-family: var(--font-story);
+	font-size: clamp(24px, 5vw, 32px);
 	font-style: italic;
+	text-align: center;
 	color: var(--color-text-muted);
+}
+
+.endingActions {
+	justify-content: center;
 }
