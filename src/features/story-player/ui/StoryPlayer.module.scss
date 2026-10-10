@@ -238,6 +238,14 @@
 	font-style: italic;
 	text-align: center;
 	color: var(--color-text-muted);
+
+	@media (prefers-reduced-motion: no-preference) {
+		transition: opacity 250ms ease;
+	}
+
+	[data-typing] & {
+		opacity: 0;
+	}
 }
 
 .endingActions {
