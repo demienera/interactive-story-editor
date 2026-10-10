@@ -40,3 +40,22 @@ Object.defineProperties(HTMLElement.prototype, {
 		},
 	},
 });
+
+// jsdom has <dialog> but not its modal API.
+// https://github.com/jsdom/jsdom/issues/3294
+HTMLDialogElement.prototype.showModal ??= function showModal(this: HTMLDialogElement) {
+	this.open = true;
+};
+
+HTMLDialogElement.prototype.close ??= function close(this: HTMLDialogElement, returnValue?: string) {
+	if (!this.open) {
+		return;
+	}
+
+	if (returnValue !== undefined) {
+		this.returnValue = returnValue;
+	}
+
+	this.open = false;
+	this.dispatchEvent(new Event('close'));
+};
