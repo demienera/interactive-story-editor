@@ -23,6 +23,14 @@ describe('StoryPlayer', () => {
 		expect(screen.getByRole('heading', { level: 1, name: 'Start' })).not.toHaveFocus();
 	});
 
+	it('shows the story description on the start screen', () => {
+		renderPlayer();
+
+		expect(
+			screen.getByText((_content, element) => element?.tagName === 'P' && element.textContent === whisperingForest.description),
+		).toBeInTheDocument();
+	});
+
 	it('plays a story to an ending with the keyboard', async () => {
 		const user = renderPlayer();
 

@@ -45,7 +45,7 @@ export function StoryPlayer({ story }: StoryPlayerProps) {
 	const titleId = useId();
 	const titleRef = useRef<HTMLHeadingElement>(null);
 	const shouldFocusTitle = useRef(false);
-	const text = currentNode && currentNode.type !== 'start' ? currentNode.text : '';
+	const text = currentNode?.type === 'start' ? story.description : (currentNode?.text ?? '');
 	const { typed, rest, isTyping, complete } = useTypewriter(text);
 
 	const completeOnKey = useEffectEvent((event: KeyboardEvent) => {
