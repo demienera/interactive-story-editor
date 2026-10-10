@@ -2,53 +2,62 @@
 
 import clsx from 'clsx';
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { deleteStory } from '@/entities/story/library/story-library';
 import type { Story } from '@/entities/story/model/types';
 import { useEntries } from '../lib/use-story-library';
+import { DeleteStoryDialog } from './DeleteStoryDialog';
+import { NewStoryButton } from './NewStoryButton';
 import { StoryCard } from './StoryCard';
 import styles from './StoryLibrary.module.scss';
 
-export function MyStories() {
+type MyStoriesProps = {
+	onDeleted: () => void;
+};
+
+export function MyStories({ onDeleted }: MyStoriesProps) {
 	const entries = useEntries();
 	const [statusMessage, setStatusMessage] = useState('');
-	const headingRef = useRef<HTMLHeadingElement>(null);
+	const [errorMessage, setErrorMessage] = useState('');
+	const [storyToDelete, setStoryToDelete] = useState<Story | null>(null);
 
 	const handleDelete = (story: Story) => {
-		if (!window.confirm(`Delete "${story.title}"? This cannot be undone.`)) {
-			return;
-		}
+		setStoryToDelete(null);
 
 		if (!deleteStory(story.id)) {
-			setStatusMessage(`Could not delete "${story.title}": browser storage is unavailable.`);
+			setErrorMessage(`Could not delete "${story.title}": browser storage is unavailable.`);
 			return;
 		}
 
-		headingRef.current?.focus();
+		setErrorMessage('');
 		setStatusMessage(`"${story.title}" deleted`);
+		onDeleted();
 	};
 
 	return (
-		<section
-			className={styles.section}
-			aria-labelledby='my-stories-heading'
-		>
-			<h2
-				ref={headingRef}
-				id='my-stories-heading'
-				className={styles.heading}
-				tabIndex={-1}
-			>
-				My stories
-			</h2>
+		<>
 			<p
 				role='status'
-				className={styles.message}
+				className={styles.visuallyHidden}
 			>
 				{statusMessage}
 			</p>
+			{errorMessage && (
+				<p
+					role='alert'
+					className={styles.error}
+				>
+					{errorMessage}
+				</p>
+			)}
 			{entries?.length === 0 && (
-				<p className={styles.message}>No stories yet. Start a new story or edit a copy of an example.</p>
+				<div className={styles.empty}>
+					<p className={styles.emptyTitle}>No stories yet</p>
+					<p className={styles.emptyText}>Start a new story from scratch, or edit a copy of one of the examples.</p>
+					<div className={styles.emptyActions}>
+						<NewStoryButton />
+					</div>
+				</div>
 			)}
 			{entries && entries.length > 0 && (
 				<ul className={styles.list}>
@@ -71,9 +80,9 @@ export function MyStories() {
 								</Link>
 								<button
 									type='button'
-									className={clsx(styles.action, styles.dangerAction)}
+									className={styles.deleteAction}
 									aria-label={`Delete ${story.title}`}
-									onClick={() => handleDelete(story)}
+									onClick={() => setStoryToDelete(story)}
 								>
 									Delete
 								</button>
@@ -82,6 +91,13 @@ export function MyStories() {
 					))}
 				</ul>
 			)}
-		</section>
+			{storyToDelete && (
+				<DeleteStoryDialog
+					story={storyToDelete}
+					onConfirm={() => handleDelete(storyToDelete)}
+					onCancel={() => setStoryToDelete(null)}
+				/>
+			)}
+		</>
 	);
 }
