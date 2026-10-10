@@ -12,10 +12,10 @@ Product overview is in `README.md`, versions and task order are in `ROADMAP.md`.
 - `@xyflow/react` 12 (React Flow)
 - SCSS Modules
 - `clsx` for combining class names
-- Vitest
+- Vitest, React Testing Library (jsdom)
 - React Hook Form + Zod
 
-Planned, not installed yet: React Testing Library, Redux Toolkit (see `ROADMAP.md`).
+Planned, not installed yet: Redux Toolkit (see `ROADMAP.md`).
 
 ## Commands
 
@@ -28,16 +28,19 @@ Planned, not installed yet: React Testing Library, Redux Toolkit (see `ROADMAP.m
 ## Layout
 
 - `src/entities/story/model`: story types and `story-engine` (domain logic)
-- `src/entities/story/data`: demo story data
-- `src/features/story-editor/lib`: story-to-flow conversion, editor layout state, initial auto layout, node form schemas
-- `src/features/story-editor/ui`: `StoryEditor` component, custom nodes (`nodes/`), node editing panel (`node-panel/`)
+- `src/entities/story/data`: built-in example stories (`examples/`) and `example-stories.ts`
+- `src/entities/story/library`: the user's stories and their layouts in localStorage (external store without React)
+- `src/features/story-library`: hooks over the store, story factory, home page story lists and buttons ("New story", "Edit a copy", "Delete")
+- `src/features/story-editor/lib`: story-to-flow conversion, editor layout state, initial auto layout, node factory, transitions (connections), edge routing, node and story details form schemas, undo history, issue messages
+- `src/features/story-editor/ui`: `StoryEditor` component, custom nodes (`nodes/`), custom edge (`edges/`), node editing panel (`node-panel/`), story check panel (`issues-panel/`), story title and description form (`story-details/`)
 - `src/features/story-player/ui`: `StoryPlayer` component
-- `src/app/editor`, `src/app/play`: route pages
+- `src/views/{home,editor,play}/ui`: page composition (`HomePage`, `EditorPage`, `PlayPage` + `UserStoryPlayer`)
+- `src/app`: Next.js routes only (`params`, `generateStaticParams`), layout and global styles
 - `src/app/styles/_tokens.scss`: design tokens (CSS custom properties), the only place with literal colors
 
 ## Conventions
 
-- Tests live next to the code as `*.test.ts`.
+- Tests live next to the code: `*.test.ts` run in Node (`unit` project), `*.test.tsx` run in jsdom with React Testing Library (`ui` project, setup in `vitest.setup.ts`).
 - Non-component files use kebab-case; components use PascalCase.
 
 # Development Guidelines
@@ -47,7 +50,9 @@ Planned, not installed yet: React Testing Library, Redux Toolkit (see `ROADMAP.m
 - Keep domain logic independent from React, Redux, and React Flow.
 - `entities` contain domain models and domain logic.
 - `features` contain user-facing functionality.
-- `app` contains routes and page composition.
+- `views` compose features into pages (the FSD `pages` layer; named `views` because Next.js treats `src/pages` as the Pages Router).
+- `app` contains Next.js routes only; a route reads `params` and renders a view.
+- A layer imports only from layers below it (`app → views → features → entities`); features never import each other.
 - React Flow is a presentation layer for the story editor, not the source of truth.
 - Avoid abstractions that do not solve a real current problem.
 
@@ -92,7 +97,7 @@ Planned, not installed yet: React Testing Library, Redux Toolkit (see `ROADMAP.m
 
 - Test behavior and contracts rather than implementation details.
 - Keep domain logic tests independent from React.
-- Use React Testing Library for important UI behavior (once it is installed).
+- Use React Testing Library for important UI behavior.
 - Prefer meaningful tests over tests written only for coverage.
 - Run lint, build, and tests after significant changes.
 
